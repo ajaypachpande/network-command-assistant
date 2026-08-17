@@ -147,6 +147,9 @@ def vpn_troubleshoot():
 @app.route("/troubleshoot/routing")
 def routing_troubleshoot():
     return render_template("routing_troubleshoot.html")
+@app.route("/troubleshoot")
+def troubleshoot():
+    return render_template("troubleshoot.html")
 @app.route("/health")
 def health():
     return {

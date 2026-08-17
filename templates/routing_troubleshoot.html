@@ -1,0 +1,896 @@
+<!doctype html>
+
+<html>
+
+<head>
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+>
+
+<title>
+Routing Troubleshooting
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/style.css"
+>
+
+</head>
+
+<body>
+
+<nav>
+
+<b>
+Network Command Assistant
+</b>
+
+<span>
+
+<a href="/">
+Search
+</a>
+
+<a href="/compare">
+Compare
+</a>
+
+<a href="/device-finder">
+End Device Finder
+</a>
+
+<a href="/troubleshoot/vpn">
+VPN Troubleshoot
+</a>
+
+<a href="/troubleshoot/routing">
+Routing Troubleshoot
+</a>
+
+</span>
+
+</nav>
+
+
+<main>
+
+<h1>
+BGP and OSPF Troubleshooting
+</h1>
+
+<p>
+Use a structured troubleshooting path instead of jumping directly into debug commands.
+</p>
+
+
+<div class="quick">
+
+<a href="#cisco-bgp">
+Cisco BGP
+</a>
+
+<a href="#cisco-ospf">
+Cisco OSPF
+</a>
+
+<a href="#fortigate-routing">
+FortiGate
+</a>
+
+<a href="#paloalto-routing">
+Palo Alto
+</a>
+
+</div>
+
+
+<!-- CISCO BGP -->
+
+<section id="cisco-bgp">
+
+<h1>
+Cisco BGP Troubleshooting
+</h1>
+
+
+<div class="card">
+
+<h2>
+1. Check BGP neighbor state
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show ip bgp summary</pre>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Neighbor IP address.
+</li>
+
+<li>
+Remote AS number.
+</li>
+
+<li>
+Up/Down timer.
+</li>
+
+<li>
+State/PfxRcd.
+</li>
+
+</ul>
+
+<h3>
+Healthy result
+</h3>
+
+<p>
+An established IPv4 BGP neighbor normally shows the number of received prefixes in State/PfxRcd.
+</p>
+
+<h3>
+Problem states
+</h3>
+
+<pre>
+Idle
+Connect
+Active
+OpenSent
+OpenConfirm
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+2. Neighbor stuck in Active
+</h2>
+
+<p>
+Active usually means BGP is repeatedly trying to establish its TCP session.
+</p>
+
+<h3>
+Start with reachability
+</h3>
+
+<pre>ping &lt;neighbor-ip&gt;</pre>
+
+<h3>
+Check route to neighbor
+</h3>
+
+<pre>show ip route &lt;neighbor-ip&gt;</pre>
+
+<h3>
+Inspect neighbor configuration/state
+</h3>
+
+<pre>show ip bgp neighbors &lt;neighbor-ip&gt;</pre>
+
+<h3>
+Check
+</h3>
+
+<ul>
+
+<li>
+Correct neighbor IP.
+</li>
+
+<li>
+Correct remote AS.
+</li>
+
+<li>
+TCP port 179 reachability.
+</li>
+
+<li>
+Source interface/update-source.
+</li>
+
+<li>
+eBGP multihop if peer is not directly connected.
+</li>
+
+<li>
+Authentication mismatch if configured.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+3. Neighbor is Established but routes are missing
+</h2>
+
+<h3>
+Check BGP table
+</h3>
+
+<pre>show ip bgp</pre>
+
+<h3>
+Check a specific prefix
+</h3>
+
+<pre>show ip bgp &lt;prefix&gt;</pre>
+
+<h3>
+Check what you received
+</h3>
+
+<pre>show ip bgp neighbors &lt;neighbor-ip&gt; received-routes</pre>
+
+<p>
+Availability of received-routes output can depend on platform/configuration such as soft reconfiguration.
+</p>
+
+<h3>
+Check what you advertise
+</h3>
+
+<pre>show ip bgp neighbors &lt;neighbor-ip&gt; advertised-routes</pre>
+
+<h3>
+Then inspect
+</h3>
+
+<ul>
+
+<li>
+Prefix lists.
+</li>
+
+<li>
+Route maps.
+</li>
+
+<li>
+AS-path filters.
+</li>
+
+<li>
+Communities.
+</li>
+
+<li>
+Network statements.
+</li>
+
+<li>
+Redistribution.
+</li>
+
+<li>
+Best-path selection.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+4. BGP route exists but is not installed
+</h2>
+
+<pre>show ip bgp &lt;prefix&gt;</pre>
+
+<pre>show ip route &lt;prefix&gt;</pre>
+
+<h3>
+Think about
+</h3>
+
+<ul>
+
+<li>
+Is this the BGP best path?
+</li>
+
+<li>
+Does another routing protocol have a better administrative distance?
+</li>
+
+<li>
+Is the BGP next hop reachable?
+</li>
+
+<li>
+Is recursion resolving correctly?
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Cisco BGP decision path
+</h2>
+
+<pre>
+BGP problem
+    |
+    v
+show ip bgp summary
+    |
+    +---- Neighbor not Established
+    |          |
+    |          v
+    |       Reachability
+    |          |
+    |       TCP 179
+    |          |
+    |     Remote AS / Source
+    |
+    +---- Established
+               |
+               v
+       Are prefixes received?
+               |
+        +------+------+
+        |             |
+       NO            YES
+        |             |
+        v             v
+   Filters /      Best path
+   advertisement      |
+                      v
+                 Routing table
+</pre>
+
+</div>
+
+</section>
+
+
+<!-- CISCO OSPF -->
+
+<section id="cisco-ospf">
+
+<h1>
+Cisco OSPF Troubleshooting
+</h1>
+
+
+<div class="card">
+
+<h2>
+1. Check OSPF neighbors
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show ip ospf neighbor</pre>
+
+<h3>
+Common states
+</h3>
+
+<pre>
+DOWN
+INIT
+2WAY
+EXSTART
+EXCHANGE
+LOADING
+FULL
+</pre>
+
+<p>
+FULL is normally expected when routers need a complete adjacency.
+</p>
+
+<p>
+On broadcast networks, seeing 2WAY with some DROTHER neighbors can be normal.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+2. Neighbor stuck in INIT
+</h2>
+
+<p>
+INIT means you are receiving the neighbor's Hello packets, but your own router ID is not being seen in the neighbor's Hello.
+</p>
+
+<h3>
+Investigate
+</h3>
+
+<ul>
+
+<li>
+Unidirectional connectivity.
+</li>
+
+<li>
+ACL/firewall filtering.
+</li>
+
+<li>
+Layer 2 issues.
+</li>
+
+<li>
+Multicast delivery.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+3. Neighbor stuck in EXSTART / EXCHANGE
+</h2>
+
+<h3>
+Check the interface
+</h3>
+
+<pre>show ip ospf interface</pre>
+
+<h3>
+Common checks
+</h3>
+
+<ul>
+
+<li>
+MTU mismatch.
+</li>
+
+<li>
+Duplicate router IDs.
+</li>
+
+<li>
+Packet loss.
+</li>
+
+<li>
+Interface/network-type mismatch.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+4. Check OSPF interface parameters
+</h2>
+
+<pre>show ip ospf interface</pre>
+
+<h3>
+Compare between neighbors
+</h3>
+
+<ul>
+
+<li>
+Area ID.
+</li>
+
+<li>
+Hello timer.
+</li>
+
+<li>
+Dead timer.
+</li>
+
+<li>
+Authentication.
+</li>
+
+<li>
+Network type.
+</li>
+
+<li>
+MTU.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+5. Check the link-state database
+</h2>
+
+<pre>show ip ospf database</pre>
+
+<h3>
+Useful LSA types
+</h3>
+
+<pre>
+Type 1  Router LSA
+Type 2  Network LSA
+Type 3  Summary LSA
+Type 4  ASBR Summary LSA
+Type 5  External LSA
+Type 7  NSSA External LSA
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Type 3 LSA and high CPU
+</h2>
+
+<span class="risk caution">
+INVESTIGATE
+</span>
+
+<p>
+A Type 3 LSA is generated by an ABR to advertise networks between OSPF areas.
+</p>
+
+<p>
+A high number of Type 3 LSAs does not automatically mean the Type 3 LSA itself is the root cause of high CPU.
+</p>
+
+<h3>
+Look for
+</h3>
+
+<ul>
+
+<li>
+Repeated LSA churn.
+</li>
+
+<li>
+Frequent SPF calculations.
+</li>
+
+<li>
+Flapping interfaces.
+</li>
+
+<li>
+Flapping OSPF neighbors.
+</li>
+
+<li>
+Route redistribution instability.
+</li>
+
+<li>
+Large OSPF databases.
+</li>
+
+<li>
+Poor summarization between areas.
+</li>
+
+</ul>
+
+<h3>
+Check database size
+</h3>
+
+<pre>show ip ospf database</pre>
+
+<p>
+On supported IOS XE platforms, database summary information can help quantify LSAs rather than assuming a particular LSA type is inherently the problem.
+</p>
+
+<h3>
+Check neighbor stability
+</h3>
+
+<pre>show ip ospf neighbor</pre>
+
+<h3>
+Check interfaces
+</h3>
+
+<pre>show ip ospf interface</pre>
+
+<h3>
+Check CPU
+</h3>
+
+<pre>show processes cpu sorted</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+OSPF interview troubleshooting path
+</h2>
+
+<pre>
+CPU became high after enabling OSPF
+          |
+          v
+Do NOT immediately blame an LSA type
+          |
+          v
+Check CPU process
+          |
+          v
+Check neighbor stability
+          |
+          v
+Check interface flaps
+          |
+          v
+Check LSA/database growth
+          |
+          v
+Check SPF churn
+          |
+          v
+Check redistribution
+          |
+          v
+Consider summarization/design
+</pre>
+
+</div>
+
+</section>
+
+
+<!-- FORTIGATE -->
+
+<section id="fortigate-routing">
+
+<h1>
+FortiGate BGP / OSPF
+</h1>
+
+
+<div class="card">
+
+<h2>
+BGP summary
+</h2>
+
+<pre>get router info bgp summary</pre>
+
+<p>
+Check neighbor state, AS, uptime, and received prefix count.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+BGP neighbor detail
+</h2>
+
+<pre>get router info bgp neighbors</pre>
+
+<p>
+Use when you need more information about a BGP peer than the summary provides.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Routing table
+</h2>
+
+<pre>get router info routing-table all</pre>
+
+<p>
+Confirm that expected BGP or OSPF routes are actually installed.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+OSPF neighbors
+</h2>
+
+<pre>get router info ospf neighbor all</pre>
+
+<p>
+Check neighbor state and adjacency.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+OSPF interface
+</h2>
+
+<pre>get router info ospf interface</pre>
+
+<p>
+Check which interfaces participate in OSPF and review their operational parameters.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+OSPF database
+</h2>
+
+<pre>get router info ospf database brief</pre>
+
+<p>
+Use this when investigating LSAs and database size.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- PALO ALTO -->
+
+<section id="paloalto-routing">
+
+<h1>
+Palo Alto BGP / OSPF
+</h1>
+
+
+<div class="card">
+
+<h2>
+BGP summary
+</h2>
+
+<pre>show routing protocol bgp summary</pre>
+
+<p>
+Use this for a quick BGP peer status overview.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Routing table
+</h2>
+
+<pre>show routing route</pre>
+
+<p>
+Confirm whether expected dynamic routes are installed in the routing table.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Forwarding table
+</h2>
+
+<pre>show routing fib</pre>
+
+<p>
+This helps distinguish a control-plane routing issue from a forwarding-table issue.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+OSPF verification
+</h2>
+
+<p>
+For PAN-OS, verify OSPF adjacency and then verify that OSPF-learned routes appear in the routing and forwarding tables.
+</p>
+
+<pre>show routing route</pre>
+
+<pre>show routing fib</pre>
+
+</div>
+
+</section>
+
+
+<div class="card">
+
+<h2>
+Core troubleshooting principle
+</h2>
+
+<pre>
+Protocol adjacency
+       |
+       v
+Protocol database
+       |
+       v
+Best path / route selection
+       |
+       v
+Routing table
+       |
+       v
+Forwarding table
+       |
+       v
+Actual packet flow
+</pre>
+
+<p>
+A routing protocol can have a healthy neighbor relationship while traffic still fails because the expected route was filtered, lost best-path selection, failed next-hop resolution, or never reached the forwarding table.
+</p>
+
+</div>
+
+
+</main>
+
+</body>
+
+</html>

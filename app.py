@@ -144,7 +144,9 @@ def device_finder():
 @app.route("/troubleshoot/vpn")
 def vpn_troubleshoot():
     return render_template("vpn_troubleshoot.html")
-
+@app.route("/troubleshoot/routing")
+def routing_troubleshoot():
+    return render_template("routing_troubleshoot.html")
 @app.route("/health")
 def health():
     return {

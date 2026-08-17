@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Network Command Assistant</title><link rel="stylesheet" href="/static/style.css"></head>
+<body><nav><b>Network Command Assistant</b><span><a href="/">Search</a><a href="/compare">Compare</a></span></nav><main>
+<h1>Find network commands by what you want to do</h1><p>Search Cisco, FortiGate and Palo Alto using troubleshooting language.</p>
+<form><input name="q" value="{{q}}" placeholder="Try: bgp neighbor, routing table, arp, ipsec tunnel"><select name="vendor"><option value="">All vendors</option>{% for v in vendors %}<option {% if vendor==v %}selected{% endif %}>{{v}}</option>{% endfor %}</select><button>Search</button></form>
+<div class="quick"><a href="/?q=bgp+neighbor">BGP</a><a href="/?q=routing+table">Routes</a><a href="/?q=arp">ARP</a><a href="/?q=ipsec+tunnel">IPsec</a><a href="/compare?q=bgp">Compare BGP</a></div>
+{% if q and not results %}<div class="card">No matches. Try a simpler phrase.</div>{% endif %}
+{% for c in results %}<div class="card"><div><b>{{c.vendor}}</b> · {{c.platform}} <span class="risk {{c.risk}}">{{c.risk}}</span></div><small>{{c.category}}</small><h2>{{c.title}}</h2><pre>{{c.command}}</pre><p>{{c.description}}</p><a href="/command/{{c.id}}">Open details →</a></div>{% endfor %}
+</main></body></html>

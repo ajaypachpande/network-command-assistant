@@ -1,0 +1,932 @@
+<!doctype html>
+
+<html>
+
+<head>
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+>
+
+<title>
+VPN Troubleshooting
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/style.css"
+>
+
+</head>
+
+
+<body>
+
+<nav>
+
+<b>
+Network Command Assistant
+</b>
+
+<span>
+
+<a href="/">
+Search
+</a>
+
+<a href="/compare">
+Compare
+</a>
+
+<a href="/device-finder">
+End Device Finder
+</a>
+
+<a href="/troubleshoot/vpn">
+VPN Troubleshoot
+</a>
+
+</span>
+
+</nav>
+
+
+<main>
+
+<h1>
+Site-to-Site IPsec VPN Troubleshooting
+</h1>
+
+<p>
+Follow the tunnel from Phase 1 through Phase 2, routing, policy, sessions, and packet flow.
+</p>
+
+
+<div class="quick">
+
+<a href="#fortigate">
+FortiGate
+</a>
+
+<a href="#paloalto">
+Palo Alto
+</a>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- FORTIGATE -->
+<!-- ====================================================== -->
+
+<section id="fortigate">
+
+<h1>
+FortiGate IPsec VPN
+</h1>
+
+
+<div class="card">
+
+<h2>
+1. Check overall tunnel status
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>get vpn ipsec tunnel summary</pre>
+
+<h3>
+What it does
+</h3>
+
+<p>
+Provides a quick summary of IPsec tunnels and Phase 2 selector state.
+</p>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Expected tunnel name.
+</li>
+
+<li>
+Selectors showing as up.
+</li>
+
+<li>
+RX and TX counters increasing when traffic is generated.
+</li>
+
+</ul>
+
+<h3>
+Decision
+</h3>
+
+<p>
+If the tunnel or selectors are down, continue to Phase 1 and Phase 2 checks.
+</p>
+
+<p>
+If the tunnel is up but traffic does not pass, jump to routing, firewall policy, session, and packet capture checks.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+2. Check IKE / Phase 1
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>diagnose vpn ike gateway list</pre>
+
+<h3>
+What it does
+</h3>
+
+<p>
+Displays IKE gateway and Phase 1 security association information.
+</p>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Correct tunnel or gateway name.
+</li>
+
+<li>
+Correct remote peer IP.
+</li>
+
+<li>
+IKE version.
+</li>
+
+<li>
+Established IKE security association.
+</li>
+
+</ul>
+
+<h3>
+If Phase 1 is down
+</h3>
+
+<ul>
+
+<li>
+Verify peer reachability.
+</li>
+
+<li>
+Verify UDP 500 and UDP 4500 are not blocked.
+</li>
+
+<li>
+Compare pre-shared key or certificate configuration.
+</li>
+
+<li>
+Compare IKE version.
+</li>
+
+<li>
+Compare encryption algorithm.
+</li>
+
+<li>
+Compare authentication algorithm.
+</li>
+
+<li>
+Compare Diffie-Hellman group.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+3. Check Phase 2 / IPsec SA
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>diagnose vpn tunnel list</pre>
+
+<h3>
+What it does
+</h3>
+
+<p>
+Displays IPsec tunnel and security association details.
+</p>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Correct Phase 2 selectors.
+</li>
+
+<li>
+Local and remote protected subnets.
+</li>
+
+<li>
+Encryption and authentication parameters.
+</li>
+
+<li>
+Packet counters.
+</li>
+
+</ul>
+
+<h3>
+If Phase 1 is up but Phase 2 is down
+</h3>
+
+<ul>
+
+<li>
+Compare local and remote selectors.
+</li>
+
+<li>
+Check Phase 2 encryption settings.
+</li>
+
+<li>
+Check PFS configuration.
+</li>
+
+<li>
+Check lifetime settings if negotiation repeatedly fails.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+4. Check routing
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>get router info routing-table all</pre>
+
+<h3>
+What to look for
+</h3>
+
+<p>
+Confirm the remote VPN subnet resolves toward the expected IPsec tunnel or appropriate next hop.
+</p>
+
+<p>
+Also verify the return route exists on the remote side.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+5. Check firewall policy and NAT
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show firewall policy</pre>
+
+<h3>
+What to verify
+</h3>
+
+<ul>
+
+<li>
+Correct source interface.
+</li>
+
+<li>
+Correct IPsec destination interface.
+</li>
+
+<li>
+Correct local and remote address objects.
+</li>
+
+<li>
+Required services are permitted.
+</li>
+
+<li>
+NAT behavior is intentional.
+</li>
+
+</ul>
+
+<p>
+A tunnel can be fully established while firewall policy or NAT still prevents user traffic.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+6. Check firewall sessions
+</h2>
+
+<span class="risk caution">
+CAUTION
+</span>
+
+<pre>diagnose sys session list</pre>
+
+<p>
+On a busy firewall this can produce a large amount of output.
+</p>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Source and destination IP.
+</li>
+
+<li>
+Policy ID.
+</li>
+
+<li>
+Incoming and outgoing interface.
+</li>
+
+<li>
+NAT translation if applicable.
+</li>
+
+<li>
+Session state and packet counters.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+7. Packet capture
+</h2>
+
+<span class="risk caution">
+CAUTION
+</span>
+
+<p>
+Replace the address with the inside host you are troubleshooting.
+</p>
+
+<pre>diagnose sniffer packet any 'host 10.10.20.55' 4 0 l</pre>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Does traffic arrive at the FortiGate?
+</li>
+
+<li>
+Does traffic leave toward the VPN?
+</li>
+
+<li>
+Does return traffic arrive?
+</li>
+
+<li>
+Are TCP SYN packets unanswered?
+</li>
+
+<li>
+Are ICMP responses returning?
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+8. Advanced IKE debugging
+</h2>
+
+<span class="risk caution">
+CAUTION
+</span>
+
+<p>
+Use advanced debug only when the previous checks are insufficient. Debug output can be very verbose on production firewalls.
+</p>
+
+<p>
+Always scope debugging as narrowly as possible and disable it when finished.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+FortiGate decision path
+</h2>
+
+<pre>
+Tunnel problem
+     |
+     v
+get vpn ipsec tunnel summary
+     |
+     +---- Tunnel DOWN
+     |        |
+     |        v
+     |  diagnose vpn ike gateway list
+     |        |
+     |        +---- Phase 1 DOWN
+     |        |       |
+     |        |       v
+     |        |   Peer / PSK / IKE parameters
+     |        |
+     |        +---- Phase 1 UP
+     |                |
+     |                v
+     |       diagnose vpn tunnel list
+     |                |
+     |                v
+     |         Phase 2 selectors
+     |
+     +---- Tunnel UP but traffic fails
+              |
+              v
+           Routing
+              |
+              v
+        Firewall policy
+              |
+              v
+            Session
+              |
+              v
+        Packet capture
+</pre>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- PALO ALTO -->
+<!-- ====================================================== -->
+
+<section id="paloalto">
+
+<h1>
+Palo Alto IPsec VPN
+</h1>
+
+
+<div class="card">
+
+<h2>
+1. Check overall tunnel state
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show running tunnel flow info</pre>
+
+<h3>
+What it does
+</h3>
+
+<p>
+Displays operational information and statistics for VPN tunnel flows.
+</p>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Expected tunnel.
+</li>
+
+<li>
+Tunnel status.
+</li>
+
+<li>
+Traffic and flow information.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+2. Check IKE / Phase 1
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show vpn ike-sa</pre>
+
+<h3>
+What it does
+</h3>
+
+<p>
+Displays IKE Phase 1 security associations.
+</p>
+
+<h3>
+For a specific gateway
+</h3>
+
+<pre>show vpn ike-sa gateway &lt;gateway-name&gt;</pre>
+
+<h3>
+If Phase 1 is down
+</h3>
+
+<ul>
+
+<li>
+Verify peer reachability.
+</li>
+
+<li>
+Verify pre-shared key or certificates.
+</li>
+
+<li>
+Verify IKE version.
+</li>
+
+<li>
+Compare encryption and authentication algorithms.
+</li>
+
+<li>
+Compare Diffie-Hellman group.
+</li>
+
+<li>
+Verify UDP 500/4500 connectivity where applicable.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+3. Check Phase 2 / IPsec SA
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show vpn ipsec-sa</pre>
+
+<h3>
+What it does
+</h3>
+
+<p>
+Displays IPsec Phase 2 security associations.
+</p>
+
+<h3>
+What to look for
+</h3>
+
+<ul>
+
+<li>
+Expected tunnel.
+</li>
+
+<li>
+Active security associations.
+</li>
+
+<li>
+Correct proxy IDs where used.
+</li>
+
+<li>
+Matching Phase 2 parameters.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+4. Check VPN counters
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show vpn flow</pre>
+
+<h3>
+What to look for
+</h3>
+
+<p>
+Look for traffic counters and evidence that encrypted/decrypted traffic is increasing while you generate test traffic.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+5. Verify routing
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<pre>show routing route</pre>
+
+<h3>
+What to verify
+</h3>
+
+<p>
+Confirm the remote network uses the correct tunnel interface and virtual router.
+</p>
+
+<p>
+Also confirm the remote VPN peer has a return route to your local network.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+6. Check sessions
+</h2>
+
+<span class="risk caution">
+CAUTION
+</span>
+
+<pre>show session all</pre>
+
+<p>
+This can produce significant output on a busy firewall.
+</p>
+
+<h3>
+Look for
+</h3>
+
+<ul>
+
+<li>
+Source address.
+</li>
+
+<li>
+Destination address.
+</li>
+
+<li>
+Application.
+</li>
+
+<li>
+Security rule.
+</li>
+
+<li>
+NAT translation.
+</li>
+
+<li>
+Ingress and egress interfaces.
+</li>
+
+<li>
+Session state.
+</li>
+
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+7. Check security and NAT policy
+</h2>
+
+<span class="risk safe">
+SAFE
+</span>
+
+<p>
+Verify the traffic matches the expected security policy and NAT policy.
+</p>
+
+<p>
+An established VPN tunnel does not automatically mean user traffic is allowed through the firewall.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+8. Trigger negotiation when required
+</h2>
+
+<span class="risk caution">
+CAUTION
+</span>
+
+<p>
+Palo Alto provides operational test commands that can initiate VPN negotiation. Use these intentionally during troubleshooting.
+</p>
+
+<pre>test vpn ike-sa gateway &lt;gateway-name&gt;</pre>
+
+<pre>test vpn ipsec-sa tunnel &lt;tunnel-name&gt;</pre>
+
+<p>
+Use this when you need to deliberately initiate Phase 1 or Phase 2 negotiation rather than waiting for interesting traffic.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Palo Alto decision path
+</h2>
+
+<pre>
+VPN problem
+     |
+     v
+show running tunnel flow info
+     |
+     +---- Tunnel DOWN
+     |        |
+     |        v
+     |   show vpn ike-sa
+     |        |
+     |        +---- IKE DOWN
+     |        |       |
+     |        |       v
+     |        |  Peer / PSK / IKE parameters
+     |        |
+     |        +---- IKE UP
+     |                |
+     |                v
+     |        show vpn ipsec-sa
+     |                |
+     |                v
+     |          Phase 2 / Proxy ID
+     |
+     +---- Tunnel UP but traffic fails
+              |
+              v
+           Routing
+              |
+              v
+       Security / NAT policy
+              |
+              v
+           Sessions
+              |
+              v
+          VPN counters
+</pre>
+
+</div>
+
+</section>
+
+
+<div class="card">
+
+<h2>
+Key troubleshooting principle
+</h2>
+
+<pre>
+Phase 1 UP
+does not mean
+
+Phase 2 UP
+
+and
+
+Phase 2 UP
+does not mean
+
+Application traffic works
+</pre>
+
+<p>
+Treat VPN troubleshooting as separate layers: IKE negotiation, IPsec security associations, routing, security policy, NAT, session creation, and actual packet flow.
+</p>
+
+</div>
+
+
+</main>
+
+</body>
+
+</html>

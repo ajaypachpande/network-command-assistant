@@ -141,6 +141,9 @@ def device_finder():
         mac=mac
     )
 
+@app.route("/troubleshoot/vpn")
+def vpn_troubleshoot():
+    return render_template("vpn_troubleshoot.html")
 
 @app.route("/health")
 def health():

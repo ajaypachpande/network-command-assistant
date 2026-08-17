@@ -1,0 +1,384 @@
+<!doctype html>
+
+<html>
+
+<head>
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+>
+
+<title>
+End Device Finder
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/style.css"
+>
+
+</head>
+
+
+<body>
+
+<nav>
+
+<b>
+Network Command Assistant
+</b>
+
+<span>
+
+<a href="/">
+Search
+</a>
+
+<a href="/compare">
+Compare
+</a>
+
+<a href="/device-finder">
+End Device Finder
+</a>
+
+</span>
+
+</nav>
+
+
+<main>
+
+<h1>
+End Device Finder
+</h1>
+
+<p>
+Trace a device from IP address to MAC address and then to the physical switch port.
+</p>
+
+
+<div class="card">
+
+<h2>
+What information do you have?
+</h2>
+
+
+<form method="get">
+
+<input
+    name="ip"
+    value="{{ip}}"
+    placeholder="IP address, example: 10.10.20.55"
+>
+
+<input
+    name="mac"
+    value="{{mac}}"
+    placeholder="MAC address, example: 0050.56aa.bbcc"
+>
+
+<button>
+Start
+</button>
+
+</form>
+
+</div>
+
+
+{% if ip %}
+
+<div class="card">
+
+<h2>
+Step 1: Find the MAC address
+</h2>
+
+
+<p>
+You know the endpoint IP:
+</p>
+
+<pre>{{ip}}</pre>
+
+
+<h3>
+Cisco command
+</h3>
+
+<pre>show ip arp {{ip}}</pre>
+
+
+<p>
+This searches the ARP table for the IP address.
+</p>
+
+
+<h3>
+Look for
+</h3>
+
+<p>
+Find the MAC address associated with the IP address.
+</p>
+
+
+<p>
+Example:
+</p>
+
+<pre>
+Internet  {{ip}}  3  0050.56aa.bbcc  ARPA  Vlan20
+</pre>
+
+
+<p>
+From this output:
+</p>
+
+<ul>
+
+<li>
+IP = {{ip}}
+</li>
+
+<li>
+MAC = 0050.56aa.bbcc
+</li>
+
+<li>
+Layer 3 interface = Vlan20
+</li>
+
+</ul>
+
+
+<h3>
+Next step
+</h3>
+
+<p>
+Copy the MAC address from the ARP output and enter it in the MAC field above.
+</p>
+
+</div>
+
+{% endif %}
+
+
+{% if mac %}
+
+<div class="card">
+
+<h2>
+Step 2: Find the switch port
+</h2>
+
+
+<p>
+MAC address:
+</p>
+
+<pre>{{mac}}</pre>
+
+
+<h3>
+Cisco command
+</h3>
+
+<pre>show mac address-table address {{mac}}</pre>
+
+
+<p>
+This searches the switch MAC address table.
+</p>
+
+
+<h3>
+Example result
+</h3>
+
+<pre>
+Vlan    Mac Address       Type        Ports
+20      {{mac}}           DYNAMIC     Gi1/0/24
+</pre>
+
+
+<p>
+In this example the device is learned from:
+</p>
+
+<pre>Gi1/0/24</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Step 3: Check the interface
+</h2>
+
+
+<p>
+Once you identify the port, verify its status.
+</p>
+
+
+<pre>show interfaces status</pre>
+
+
+<p>
+For more detail:
+</p>
+
+
+<pre>show interfaces Gi1/0/24</pre>
+
+
+<p>
+Check the switchport configuration:
+</p>
+
+
+<pre>show interfaces Gi1/0/24 switchport</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Step 4: Is this the endpoint or an uplink?
+</h2>
+
+
+<p>
+If the MAC is learned directly from an access port, you have probably found the endpoint.
+</p>
+
+
+<p>
+If the MAC appears on a trunk or uplink, the endpoint is connected to another downstream switch.
+</p>
+
+
+<h3>
+Identify the neighboring switch
+</h3>
+
+
+<pre>show cdp neighbors Gi1/0/24 detail</pre>
+
+
+<p>
+or:
+</p>
+
+
+<pre>show lldp neighbors Gi1/0/24 detail</pre>
+
+
+<h3>
+Then
+</h3>
+
+<p>
+Connect to the downstream switch and repeat:
+</p>
+
+
+<pre>show mac address-table address {{mac}}</pre>
+
+
+<p>
+Continue until the MAC is learned from the actual access port.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+Final troubleshooting path
+</h2>
+
+<pre>
+Known IP
+   |
+   v
+show ip arp &lt;IP&gt;
+   |
+   v
+Find MAC address
+   |
+   v
+show mac address-table address &lt;MAC&gt;
+   |
+   v
+Find switch port
+   |
+   +---- Access port ----> Endpoint found
+   |
+   +---- Trunk/Uplink
+             |
+             v
+      Find downstream switch
+             |
+             v
+      Repeat MAC lookup
+</pre>
+
+</div>
+
+{% endif %}
+
+
+<div class="card">
+
+<h2>
+Important concept
+</h2>
+
+<p>
+The ARP lookup and MAC lookup may happen on different switches.
+</p>
+
+
+<pre>
+Layer 3 switch / gateway
+
+show ip arp 10.10.20.55
+
+        ↓
+
+MAC = 0050.56aa.bbcc
+
+        ↓
+
+Access switch
+
+show mac address-table address 0050.56aa.bbcc
+
+        ↓
+
+Gi1/0/24
+</pre>
+
+<p>
+ARP tells you which MAC belongs to an IP address.
+
+The MAC address table tells you where that MAC address is physically learned.
+</p>
+
+</div>
+
+</main>
+
+</body>
+
+</html>

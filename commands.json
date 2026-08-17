@@ -1,0 +1,246 @@
+[
+  {
+    "id": 1,
+    "vendor": "Cisco",
+    "platform": "IOS/IOS-XE",
+    "category": "BGP",
+    "title": "Show BGP Neighbor Summary",
+    "command": "show ip bgp summary",
+    "description": "Shows BGP neighbor state, uptime and prefix counts.",
+    "use_case": "Use when a BGP peer is down or expected routes are missing.",
+    "check": "Check whether the neighbor is established and whether prefixes are being received.",
+    "risk": "safe",
+    "tags": [
+      "bgp",
+      "neighbor",
+      "peer",
+      "routing"
+    ]
+  },
+  {
+    "id": 2,
+    "vendor": "Cisco",
+    "platform": "IOS/IOS-XE",
+    "category": "Routing",
+    "title": "Show Routing Table",
+    "command": "show ip route",
+    "description": "Shows the IPv4 routing table.",
+    "use_case": "Use when checking route installation or next-hop selection.",
+    "check": "Check route source, prefix, next hop, metric and outgoing interface.",
+    "risk": "safe",
+    "tags": [
+      "route",
+      "routing",
+      "next-hop"
+    ]
+  },
+  {
+    "id": 3,
+    "vendor": "Cisco",
+    "platform": "IOS/IOS-XE",
+    "category": "Interfaces",
+    "title": "Show Interface Summary",
+    "command": "show ip interface brief",
+    "description": "Shows interface IP addresses and line/protocol status.",
+    "use_case": "Use for a quick interface health check.",
+    "check": "Up/up is normally expected for an active routed interface.",
+    "risk": "safe",
+    "tags": [
+      "interface",
+      "status",
+      "ip"
+    ]
+  },
+  {
+    "id": 4,
+    "vendor": "Cisco",
+    "platform": "IOS/IOS-XE",
+    "category": "ARP",
+    "title": "Show ARP Table",
+    "command": "show ip arp",
+    "description": "Shows IPv4 ARP mappings.",
+    "use_case": "Use for local L2/L3 reachability troubleshooting.",
+    "check": "Confirm the expected IP-to-MAC mapping and interface.",
+    "risk": "safe",
+    "tags": [
+      "arp",
+      "mac",
+      "ip"
+    ]
+  },
+  {
+    "id": 5,
+    "vendor": "FortiGate",
+    "platform": "FortiOS",
+    "category": "BGP",
+    "title": "Show BGP Neighbor Summary",
+    "command": "get router info bgp summary",
+    "description": "Shows BGP peer state and prefix information.",
+    "use_case": "Use when troubleshooting BGP peering or route exchange.",
+    "check": "Check peer state, AS number, uptime and learned prefixes.",
+    "risk": "safe",
+    "tags": [
+      "bgp",
+      "neighbor",
+      "peer",
+      "routing"
+    ]
+  },
+  {
+    "id": 6,
+    "vendor": "FortiGate",
+    "platform": "FortiOS",
+    "category": "Routing",
+    "title": "Show Routing Table",
+    "command": "get router info routing-table all",
+    "description": "Shows the FortiGate routing table.",
+    "use_case": "Use when validating static or dynamic routing.",
+    "check": "Confirm the expected prefix, gateway and outgoing interface.",
+    "risk": "safe",
+    "tags": [
+      "route",
+      "routing",
+      "next-hop"
+    ]
+  },
+  {
+    "id": 7,
+    "vendor": "FortiGate",
+    "platform": "FortiOS",
+    "category": "ARP",
+    "title": "Show ARP Table",
+    "command": "get system arp",
+    "description": "Shows the FortiGate ARP table.",
+    "use_case": "Use when troubleshooting local neighbor reachability.",
+    "check": "Confirm the expected IP, MAC and interface.",
+    "risk": "safe",
+    "tags": [
+      "arp",
+      "mac",
+      "ip"
+    ]
+  },
+  {
+    "id": 8,
+    "vendor": "FortiGate",
+    "platform": "FortiOS",
+    "category": "VPN",
+    "title": "Show IPsec Tunnel Summary",
+    "command": "get vpn ipsec tunnel summary",
+    "description": "Shows a summary of IPsec tunnel state.",
+    "use_case": "Use when checking a site-to-site IPsec VPN.",
+    "check": "Confirm the expected tunnel and security associations are present.",
+    "risk": "safe",
+    "tags": [
+      "vpn",
+      "ipsec",
+      "tunnel"
+    ]
+  },
+  {
+    "id": 9,
+    "vendor": "FortiGate",
+    "platform": "FortiOS",
+    "category": "Packet Capture",
+    "title": "Packet Sniffer",
+    "command": "diagnose sniffer packet any 'host <IP>' 4 0 l",
+    "description": "Captures packets matching a filter.",
+    "use_case": "Use to confirm traffic entering or leaving the firewall.",
+    "check": "Inspect interfaces, source/destination, ports, flags and return traffic.",
+    "risk": "caution",
+    "tags": [
+      "packet",
+      "capture",
+      "sniffer",
+      "traffic"
+    ]
+  },
+  {
+    "id": 10,
+    "vendor": "Palo Alto",
+    "platform": "PAN-OS",
+    "category": "BGP",
+    "title": "Show BGP Summary",
+    "command": "show routing protocol bgp summary",
+    "description": "Shows BGP peer status and summary information.",
+    "use_case": "Use when troubleshooting BGP peering or route exchange.",
+    "check": "Check peer state, AS, uptime and route counters.",
+    "risk": "safe",
+    "tags": [
+      "bgp",
+      "neighbor",
+      "peer",
+      "routing"
+    ]
+  },
+  {
+    "id": 11,
+    "vendor": "Palo Alto",
+    "platform": "PAN-OS",
+    "category": "Routing",
+    "title": "Show Routing Table",
+    "command": "show routing route",
+    "description": "Shows routes installed in the routing table.",
+    "use_case": "Use when verifying route selection and next hops.",
+    "check": "Confirm the expected route, next hop, metric and interface.",
+    "risk": "safe",
+    "tags": [
+      "route",
+      "routing",
+      "next-hop"
+    ]
+  },
+  {
+    "id": 12,
+    "vendor": "Palo Alto",
+    "platform": "PAN-OS",
+    "category": "ARP",
+    "title": "Show ARP Table",
+    "command": "show arp all",
+    "description": "Shows ARP entries.",
+    "use_case": "Use when troubleshooting local neighbor reachability.",
+    "check": "Confirm the expected IP and MAC are learned on the correct interface.",
+    "risk": "safe",
+    "tags": [
+      "arp",
+      "mac",
+      "ip"
+    ]
+  },
+  {
+    "id": 13,
+    "vendor": "Palo Alto",
+    "platform": "PAN-OS",
+    "category": "VPN",
+    "title": "Show IPsec Security Associations",
+    "command": "show vpn ipsec-sa",
+    "description": "Shows active IPsec security associations.",
+    "use_case": "Use to verify IPsec Phase 2 state.",
+    "check": "Confirm active SAs exist for the expected tunnel.",
+    "risk": "safe",
+    "tags": [
+      "vpn",
+      "ipsec",
+      "tunnel",
+      "phase2"
+    ]
+  },
+  {
+    "id": 14,
+    "vendor": "Palo Alto",
+    "platform": "PAN-OS",
+    "category": "VPN",
+    "title": "Show IKE Security Associations",
+    "command": "show vpn ike-sa",
+    "description": "Shows active IKE security associations.",
+    "use_case": "Use to verify IKE/Phase 1 state.",
+    "check": "Confirm an IKE SA exists for the expected peer.",
+    "risk": "safe",
+    "tags": [
+      "vpn",
+      "ike",
+      "ipsec",
+      "phase1"
+    ]
+  }
+]

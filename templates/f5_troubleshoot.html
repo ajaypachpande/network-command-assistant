@@ -1,0 +1,966 @@
+<!doctype html>
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F5 BIG-IP Troubleshooting</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<nav>
+<b>Network Command Assistant</b>
+
+<span>
+<a href="/">Search</a>
+<a href="/compare">Compare</a>
+<a href="/device-finder">End Device Finder</a>
+<a href="/troubleshoot">Troubleshoot</a>
+</span>
+</nav>
+
+
+<main>
+
+<h1>F5 BIG-IP LTM Troubleshooting</h1>
+
+<p>
+Follow traffic from the client through the BIG-IP virtual server to the backend pool member,
+then use connection-table, tcpdump, TLS, and iRule troubleshooting when needed.
+</p>
+
+
+<div class="quick">
+
+<a href="#network">Network</a>
+<a href="#virtual">Virtual Server</a>
+<a href="#pool">Pool</a>
+<a href="#connections">Connections</a>
+<a href="#tcpdump">tcpdump</a>
+<a href="#tls">TLS Decryption</a>
+<a href="#irules">iRules</a>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- BASIC NETWORK -->
+<!-- ====================================================== -->
+
+<section id="network">
+
+<h1>1. Basic Network Checks</h1>
+
+
+<div class="card">
+
+<h2>Interfaces</h2>
+
+<pre>tmsh show net interface</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Interface state</li>
+<li>Speed and duplex</li>
+<li>Errors</li>
+<li>Drops</li>
+<li>Traffic counters</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Trunks</h2>
+
+<pre>tmsh show net trunk</pre>
+
+<p>
+Use this when interfaces are bundled using LACP or a static trunk.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>VLAN Configuration</h2>
+
+<pre>tmsh list net vlan</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Correct interfaces or trunks</li>
+<li>Tagged versus untagged membership</li>
+<li>Expected VLAN configuration</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Self IPs</h2>
+
+<pre>tmsh list net self</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Correct IP address</li>
+<li>Correct VLAN</li>
+<li>Port lockdown</li>
+<li>Traffic-group if relevant</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Routing Table</h2>
+
+<pre>tmsh show net route</pre>
+
+<p>
+Confirm BIG-IP has a valid route toward clients, gateways, and pool members.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>ARP Table</h2>
+
+<pre>tmsh show net arp</pre>
+
+<p>
+Use this when BIG-IP cannot reach a directly connected gateway or pool member.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- VIRTUAL SERVER -->
+<!-- ====================================================== -->
+
+<section id="virtual">
+
+<h1>2. Virtual Server</h1>
+
+
+<div class="card">
+
+<h2>Show All Virtual Servers</h2>
+
+<pre>tmsh show ltm virtual</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Availability</li>
+<li>Enabled / disabled state</li>
+<li>Connections</li>
+<li>Bits and packets in/out</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Specific Virtual Server</h2>
+
+<pre>tmsh show ltm virtual &lt;virtual-server-name&gt;</pre>
+
+<h3>Look for</h3>
+
+<ul>
+<li>Availability</li>
+<li>Client connections</li>
+<li>Traffic counters</li>
+<li>Destination VIP</li>
+<li>Service port</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Virtual Server Configuration</h2>
+
+<pre>tmsh list ltm virtual &lt;virtual-server-name&gt; all-properties</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Destination</li>
+<li>Pool</li>
+<li>Source Address Translation / SNAT</li>
+<li>Profiles</li>
+<li>Persistence</li>
+<li>iRules</li>
+<li>Policies</li>
+</ul>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- POOL -->
+<!-- ====================================================== -->
+
+<section id="pool">
+
+<h1>3. Pool and Pool Members</h1>
+
+
+<div class="card">
+
+<h2>Show Pools</h2>
+
+<pre>tmsh show ltm pool</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Specific Pool and Members</h2>
+
+<pre>tmsh show ltm pool &lt;pool-name&gt; members</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Pool availability</li>
+<li>Member state</li>
+<li>Current connections</li>
+<li>Traffic counters</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Pool Configuration</h2>
+
+<pre>tmsh list ltm pool &lt;pool-name&gt; all-properties</pre>
+
+<h3>Check</h3>
+
+<ul>
+<li>Pool members</li>
+<li>Health monitors</li>
+<li>Load-balancing method</li>
+<li>Priority groups if configured</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Node Status</h2>
+
+<pre>tmsh show ltm node</pre>
+
+<p>
+Use this to verify whether backend nodes themselves are marked available or unavailable.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- CONNECTION TABLE -->
+<!-- ====================================================== -->
+
+<section id="connections">
+
+<h1>4. Connection Troubleshooting</h1>
+
+
+<div class="card">
+
+<h2>Connection Table</h2>
+
+<pre>tmsh show sys connection</pre>
+
+<p>
+Use this to determine whether BIG-IP is creating a flow for the client traffic.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Filter by Client IP</h2>
+
+<pre>tmsh show sys connection cs-client-addr &lt;client-ip&gt;</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Filter by Virtual Server Address</h2>
+
+<pre>tmsh show sys connection cs-server-addr &lt;vip-address&gt;</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Flow Concept</h2>
+
+<pre>
+CLIENT
+   |
+   v
+Virtual Server
+   |
+   v
+BIG-IP
+   |
+   v
+Pool
+   |
+   v
+Pool Member
+</pre>
+
+<p>
+For a full-proxy BIG-IP flow, troubleshoot both the client-side connection
+and the separate server-side connection.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- TCPDUMP -->
+<!-- ====================================================== -->
+
+<section id="tcpdump">
+
+<h1>5. tcpdump</h1>
+
+
+<div class="card">
+
+<h2>Enter Bash</h2>
+
+<p>
+If your SSH session opens in tmsh:
+</p>
+
+<pre>run util bash</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Basic Live Capture</h2>
+
+<span class="risk caution">CAUTION</span>
+
+<pre>tcpdump -nni 0.0 -s0 host &lt;client-IP&gt;</pre>
+
+<p>
+Press Ctrl+C when finished.
+</p>
+
+<h3>Useful Options</h3>
+
+<ul>
+<li><code>-nn</code> avoids hostname and service-name resolution</li>
+<li><code>-i 0.0</code> captures traffic across TMM interfaces</li>
+<li><code>-s0</code> captures the full packet</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Client + HTTPS</h2>
+
+<pre>tcpdump -nni 0.0 -s0 'host &lt;client-IP&gt; and port 443'</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Pool Member Capture</h2>
+
+<pre>tcpdump -nni 0.0 -s0 'host &lt;pool-member-IP&gt; and port 443'</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Specific VLAN</h2>
+
+<pre>tcpdump -nni &lt;vlan-name&gt; -s0 host &lt;IP&gt;</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Save Capture to PCAP</h2>
+
+<pre>tcpdump -nni 0.0 -s0 -w /var/tmp/app_issue.pcap 'host &lt;client-IP&gt; and port 443'</pre>
+
+<h3>Workflow</h3>
+
+<pre>
+1. Start capture
+2. Reproduce application issue
+3. Press Ctrl+C
+4. Verify capture file
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Verify PCAP File</h2>
+
+<pre>ls -lh /var/tmp/app_issue.pcap</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Read PCAP on BIG-IP</h2>
+
+<pre>tcpdump -nnr /var/tmp/app_issue.pcap</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Copy PCAP from BIG-IP to Windows</h2>
+
+<p>
+You can use WinSCP and download:
+</p>
+
+<pre>/var/tmp/app_issue.pcap</pre>
+
+<p>
+Or use SCP from Windows or another workstation:
+</p>
+
+<pre>scp admin@&lt;BIG-IP-management-IP&gt;:/var/tmp/app_issue.pcap .</pre>
+
+<p>
+Open the downloaded file in Wireshark.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>F5 Enhanced Flow Correlation</h2>
+
+<span class="risk caution">CAUTION</span>
+
+<pre>tcpdump -nni 0.0:nnn -s0 -w /var/tmp/f5_flow.pcap 'host &lt;client-IP&gt;'</pre>
+
+<p>
+The F5-specific <code>:nnn</code> modifier adds BIG-IP flow information
+that helps correlate traffic through TMM.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Enhanced Correlation with Peer Information</h2>
+
+<pre>tcpdump -nni 0.0:nnnp -s0 -w /var/tmp/f5_flow.pcap 'host &lt;client-IP&gt;'</pre>
+
+<h3>Purpose</h3>
+
+<p>
+This is useful when you want to correlate:
+</p>
+
+<pre>
+Client-side flow
+
+Client
+  |
+  v
+BIG-IP VIP
+
+        WITH
+
+Server-side flow
+
+BIG-IP
+  |
+  v
+Pool Member
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Capture SYN and RST</h2>
+
+<pre>tcpdump -nni 0.0 -s0 'host &lt;client-IP&gt; and tcp[tcpflags] &amp; (tcp-syn|tcp-rst) != 0'</pre>
+
+<h3>Look for</h3>
+
+<ul>
+<li>Client SYN reaching BIG-IP</li>
+<li>BIG-IP response to client</li>
+<li>BIG-IP SYN to pool member</li>
+<li>Backend SYN-ACK</li>
+<li>RST packets</li>
+<li>Repeated SYN retransmissions</li>
+</ul>
+
+</div>
+
+
+<div class="card">
+
+<h2>Useful Wireshark Filters</h2>
+
+<pre>
+ip.addr == 10.10.20.55
+
+tcp.port == 443
+
+tcp.flags.reset == 1
+
+tcp.analysis.retransmission
+
+tcp.analysis.duplicate_ack
+
+tls
+
+http
+</pre>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- TLS -->
+<!-- ====================================================== -->
+
+<section id="tls">
+
+<h1>6. TLS Capture and Session Secrets</h1>
+
+
+<div class="card">
+
+<h2>Important Security Warning</h2>
+
+<span class="risk caution">SENSITIVE</span>
+
+<p>
+TLS session secrets can allow captured encrypted application traffic to be decrypted.
+Treat PCAP and session-secret files as sensitive production data.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Modern BIG-IP TLS Capture</h2>
+
+<p>
+On supported BIG-IP versions, enable the tcpdump SSL provider:
+</p>
+
+<pre>tmsh modify sys db tcpdump.sslprovider value enable</pre>
+
+<p>
+Then run:
+</p>
+
+<pre>tcpdump -nni 0.0:nnn -s0 -w /var/tmp/tls_issue.pcap 'host &lt;client-IP&gt; and port 443' --f5 ssl</pre>
+
+<h3>Workflow</h3>
+
+<pre>
+1. Enable SSL provider
+2. Start capture
+3. Reproduce TLS/application issue
+4. Press Ctrl+C
+5. Copy PCAP to workstation
+6. Analyze in Wireshark
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Verify TLS Capture</h2>
+
+<pre>ls -lh /var/tmp/tls_issue.pcap</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Copy TLS Capture Off BIG-IP</h2>
+
+<pre>scp admin@&lt;BIG-IP-management-IP&gt;:/var/tmp/tls_issue.pcap .</pre>
+
+<p>
+You can also use WinSCP.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Traditional Pre-Master Secret Workflow</h2>
+
+<span class="risk caution">SENSITIVE</span>
+
+<p>
+Where supported and appropriate, a traditional workflow may use ssldump and an authorized private key.
+</p>
+
+<pre>ssldump -r /var/tmp/app_issue.pcap -k &lt;private-key-file&gt; -M /var/tmp/session.pms</pre>
+
+<p>
+This creates a session-secret file:
+</p>
+
+<pre>/var/tmp/session.pms</pre>
+
+<p>
+Transfer both:
+</p>
+
+<pre>
+/var/tmp/app_issue.pcap
+/var/tmp/session.pms
+</pre>
+
+<p>
+to the analysis workstation.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Copy Session Secret File</h2>
+
+<pre>scp admin@&lt;BIG-IP-management-IP&gt;:/var/tmp/session.pms .</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Wireshark TLS Decryption</h2>
+
+<pre>
+1. Open PCAP in Wireshark
+
+2. Open:
+   Edit
+   → Preferences
+   → Protocols
+   → TLS
+
+3. Configure the TLS key-log or
+   pre-master-secret file when using
+   a separate session-secret file
+
+4. Apply filters:
+
+   tls
+   http
+   tcp.port == 443
+
+5. Follow the appropriate stream
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>TLS Decryption Limitation</h2>
+
+<p>
+Private-key-based decryption does not work for every TLS configuration.
+Forward-secret cipher suites using ephemeral key exchange may require captured session secrets instead of only the server private key.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- IRULES -->
+<!-- ====================================================== -->
+
+<section id="irules">
+
+<h1>7. iRule Troubleshooting</h1>
+
+
+<div class="card">
+
+<h2>Check iRules Attached to Virtual Server</h2>
+
+<pre>tmsh list ltm virtual &lt;virtual-server-name&gt; rules</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Display an iRule</h2>
+
+<pre>tmsh list ltm rule &lt;irule-name&gt;</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Watch LTM Log</h2>
+
+<pre>tail -f /var/log/ltm</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>CLIENT_ACCEPTED Example</h2>
+
+<pre>when CLIENT_ACCEPTED {
+    log local0. "Client connected: [IP::client_addr]:[TCP::client_port]"
+}</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>HTTP_REQUEST Example</h2>
+
+<pre>when HTTP_REQUEST {
+    log local0. "Client=[IP::client_addr] Host=[HTTP::host] URI=[HTTP::uri]"
+}</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>SERVER_CONNECTED Example</h2>
+
+<pre>when SERVER_CONNECTED {
+    log local0. "Pool member connected: [IP::server_addr]:[TCP::server_port]"
+}</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>SSL Session Secret Concept</h2>
+
+<span class="risk caution">SENSITIVE</span>
+
+<p>
+BIG-IP iRules provide SSL session-related commands for advanced troubleshooting.
+Use session-secret logging only in controlled troubleshooting scenarios because
+the resulting data can permit TLS decryption.
+</p>
+
+<pre>SSL::sessionsecret</pre>
+
+<p>
+For modern BIG-IP versions, prefer the supported tcpdump TLS capture workflow
+where available rather than leaving verbose session-secret logging enabled.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>Logging Caution</h2>
+
+<span class="risk caution">CAUTION</span>
+
+<p>
+Do not leave high-volume debug logging attached to busy production virtual servers.
+Enable it only long enough to reproduce the issue and then remove or disable it.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- ====================================================== -->
+<!-- TROUBLESHOOTING FLOW -->
+<!-- ====================================================== -->
+
+<div class="card">
+
+<h2>F5 Troubleshooting Path</h2>
+
+<pre>
+Application issue
+       |
+       v
+Check BIG-IP network
+       |
+       v
+Interface / VLAN / Self IP / Route
+       |
+       v
+Check Virtual Server
+       |
+       v
+Check Pool
+       |
+       v
+Check Pool Member
+       |
+       v
+Check Connection Table
+       |
+       v
+Run tcpdump
+       |
+       +---- Client side
+       |
+       +---- Server side
+       |
+       v
+Compare both flows
+       |
+       v
+Check SNAT / Return Routing
+       |
+       v
+Check Profiles / Persistence
+       |
+       v
+Check iRules / Policies
+       |
+       v
+If HTTPS issue remains
+       |
+       v
+TLS capture / session secrets
+       |
+       v
+Wireshark
+</pre>
+
+</div>
+
+
+<div class="card">
+
+<h2>Quick Example: Client Cannot Reach HTTPS Application</h2>
+
+<pre>
+1. Check VIP
+
+tmsh show ltm virtual &lt;vip-name&gt;
+
+
+2. Check pool
+
+tmsh show ltm pool &lt;pool-name&gt; members
+
+
+3. Check client connection
+
+tmsh show sys connection cs-client-addr &lt;client-IP&gt;
+
+
+4. Capture traffic
+
+tcpdump -nni 0.0:nnnp -s0 \
+-w /var/tmp/app_issue.pcap \
+'host &lt;client-IP&gt; and port 443'
+
+
+5. Reproduce issue
+
+6. Ctrl+C
+
+7. Verify PCAP
+
+ls -lh /var/tmp/app_issue.pcap
+
+
+8. Download to Windows
+
+scp admin@&lt;BIG-IP-management-IP&gt;:/var/tmp/app_issue.pcap .
+
+
+9. Analyze in Wireshark
+</pre>
+
+</div>
+
+
+</main>
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>

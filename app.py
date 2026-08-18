@@ -150,6 +150,9 @@ def routing_troubleshoot():
 @app.route("/troubleshoot")
 def troubleshoot():
     return render_template("troubleshoot.html")
+@app.route("/troubleshoot/f5")
+def f5_troubleshoot():
+    return render_template("f5_troubleshoot.html")
 @app.route("/health")
 def health():
     return {

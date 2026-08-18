@@ -1,346 +1,405 @@
 <!doctype html>
 
-<html>
+<html lang="en">
 
 <head>
 
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1"
->
+    <meta charset="UTF-8">
 
-<title>
-Network Command Assistant
-</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
-<link
-    rel="stylesheet"
-    href="/static/style.css"
->
+    <title>
+        Network Command Assistant
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
 
 </head>
 
 
 <body>
 
-<nav>
 
-<b>Network Command Assistant</b>
+<!-- =====================================================
+     SHARED NAVIGATION
+     Navbar comes from templates/partials/navbar.html
+===================================================== -->
 
-<span>
+{% include "partials/navbar.html" %}
 
-<a href="/">
-Search
-</a>
 
-<a href="/compare">
-Compare
-</a>
 
-<a href="/device-finder">
-End Device Finder
-</a>
-
-<a href="/troubleshoot">
-Troubleshoot
-</a>
-
-</span>
-
-</nav>
-
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
 
 <main>
 
-<h1>
-Find network commands by what you want to do
-</h1>
 
-<p>
-Search Cisco IOS, Cisco Nexus NX-OS, FortiGate, Palo Alto and F5
-using troubleshooting language.
-</p>
+    <!-- =================================================
+         PAGE TITLE
+    ================================================== -->
 
-
-<!-- ====================================================== -->
-<!-- SEARCH FORM -->
-<!-- ====================================================== -->
-
-<form>
-
-<input
-    name="q"
-    value="{{ q }}"
-    placeholder="Try: bgp neighbor, vpc, fex, routing table, arp, ipsec tunnel"
->
+    <h1>
+        Find network commands by what you want to do
+    </h1>
 
 
-<!-- VENDOR FILTER -->
+    <p>
+        Search Cisco IOS, Cisco Nexus NX-OS, FortiGate,
+        Palo Alto and F5 using troubleshooting language.
+    </p>
 
-<select name="vendor">
 
-<option value="">
-All vendors
-</option>
 
-{% for v in vendors %}
+    <!-- =================================================
+         SEARCH FORM
+    ================================================== -->
 
-<option
-    value="{{ v }}"
-    {% if vendor == v %}
-    selected
+    <form method="GET" action="/">
+
+
+        <!-- Search text -->
+
+        <input
+            type="text"
+            name="q"
+            value="{{ q }}"
+            placeholder="Try: bgp neighbor, vpc, fex, routing table, arp, ipsec tunnel"
+        >
+
+
+
+        <!-- Vendor filter -->
+
+        <select name="vendor">
+
+            <option value="">
+                All vendors
+            </option>
+
+
+            {% for v in vendors %}
+
+            <option
+                value="{{ v }}"
+                {% if vendor == v %}
+                selected
+                {% endif %}
+            >
+                {{ v }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+
+        <!-- Platform filter -->
+
+        <select name="platform">
+
+            <option value="">
+                All platforms
+            </option>
+
+
+            {% for p in platforms %}
+
+            <option
+                value="{{ p }}"
+                {% if platform == p %}
+                selected
+                {% endif %}
+            >
+                {{ p }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+
+        <!-- Search button -->
+
+        <button type="submit">
+            Search
+        </button>
+
+
+    </form>
+
+
+
+    <!-- =================================================
+         QUICK SEARCH BUTTONS
+    ================================================== -->
+
+    <div class="quick">
+
+
+        <a href="/?q=bgp+neighbor">
+            BGP
+        </a>
+
+
+        <a href="/?q=ospf">
+            OSPF
+        </a>
+
+
+        <a href="/?q=routing+table">
+            Routes
+        </a>
+
+
+        <a href="/?q=arp">
+            ARP
+        </a>
+
+
+        <a href="/?q=ipsec+tunnel">
+            IPsec
+        </a>
+
+
+        <a
+            href="/?q=vpc&vendor=Cisco&platform=Nexus+NX-OS"
+        >
+            Nexus vPC
+        </a>
+
+
+        <a
+            href="/?q=fex&vendor=Cisco&platform=Nexus+NX-OS"
+        >
+            Nexus FEX
+        </a>
+
+
+        <a
+            href="/?q=fabricpath&vendor=Cisco&platform=Nexus+NX-OS"
+        >
+            FabricPath
+        </a>
+
+
+        <a
+            href="/?q=license&vendor=Cisco&platform=Nexus+NX-OS"
+        >
+            Nexus License
+        </a>
+
+
+        <a
+            href="/?q=span&vendor=Cisco&platform=Nexus+NX-OS"
+        >
+            SPAN
+        </a>
+
+
+        <a
+            href="/?q=tcpdump&vendor=F5&platform=BIG-IP"
+        >
+            tcpdump
+        </a>
+
+
+        <a href="/compare?q=bgp">
+            Compare BGP
+        </a>
+
+
+        <a href="/device-finder">
+            Find End Device
+        </a>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         NO SEARCH RESULTS
+    ================================================== -->
+
+    {% if q and not results %}
+
+    <div class="card">
+
+        <small>
+            Search Result
+        </small>
+
+
+        <h2>
+            No matches found
+        </h2>
+
+
+        <p>
+            Try a simpler troubleshooting phrase,
+            another vendor or platform,
+            or remove one of the filters.
+        </p>
+
+    </div>
+
     {% endif %}
->
-{{ v }}
-</option>
 
-{% endfor %}
 
-</select>
 
+    <!-- =================================================
+         SEARCH RESULTS
+    ================================================== -->
 
-<!-- PLATFORM FILTER -->
+    {% for c in results %}
 
-<select name="platform">
 
-<option value="">
-All platforms
-</option>
+    <div class="card">
 
-{% for p in platforms %}
 
-<option
-    value="{{ p }}"
-    {% if platform == p %}
-    selected
-    {% endif %}
->
-{{ p }}
-</option>
+        <!-- Vendor / platform -->
 
-{% endfor %}
+        <div>
 
-</select>
+            <b>
+                {{ c.vendor }}
+            </b>
 
+            ·
 
-<button>
-Search
-</button>
+            {{ c.platform }}
 
-</form>
 
+            {% if c.risk %}
 
-<!-- ====================================================== -->
-<!-- QUICK SEARCH -->
-<!-- ====================================================== -->
+            <span class="risk {{ c.risk }}">
+                {{ c.risk }}
+            </span>
 
-<div class="quick">
+            {% endif %}
 
-<a href="/?q=bgp+neighbor">
-BGP
-</a>
+        </div>
 
-<a href="/?q=ospf">
-OSPF
-</a>
 
-<a href="/?q=routing+table">
-Routes
-</a>
 
-<a href="/?q=arp">
-ARP
-</a>
+        <!-- Category -->
 
-<a href="/?q=ipsec+tunnel">
-IPsec
-</a>
+        <small>
+            {{ c.category }}
+        </small>
 
-<a href="/?q=vpc&vendor=Cisco&platform=Nexus+NX-OS">
-Nexus vPC
-</a>
 
-<a href="/?q=fex&vendor=Cisco&platform=Nexus+NX-OS">
-Nexus FEX
-</a>
 
-<a href="/?q=fabricpath&vendor=Cisco&platform=Nexus+NX-OS">
-FabricPath
-</a>
+        <!-- Command title -->
 
-<a href="/?q=license&vendor=Cisco&platform=Nexus+NX-OS">
-Nexus License
-</a>
+        <h2>
+            {{ c.title }}
+        </h2>
 
-<a href="/?q=span&vendor=Cisco&platform=Nexus+NX-OS">
-SPAN
-</a>
 
-<a href="/?q=tcpdump">
-tcpdump
-</a>
 
-<a href="/compare?q=bgp">
-Compare BGP
-</a>
+        <!-- CLI command -->
 
-<a href="/device-finder">
-Find End Device
-</a>
+        <div class="terminal-title">
 
-</div>
+            {{ c.platform }} CLI
 
+        </div>
 
-<!-- ====================================================== -->
-<!-- NO RESULTS -->
-<!-- ====================================================== -->
 
-{% if q and not results %}
+        <pre>{{ c.command }}</pre>
 
-<div class="card">
 
-<h2>
-No matches found
-</h2>
 
-<p>
-Try a simpler search phrase or select a different vendor/platform.
-</p>
+        <!-- Description -->
 
-<p>
-Examples:
-</p>
+        <p>
+            {{ c.description }}
+        </p>
 
-<pre>vpc
-fex
-bgp
-ospf
-arp
-routing table
-ipsec
-tcpdump
-pool member</pre>
 
-</div>
 
-{% endif %}
+        <!-- Use case -->
 
+        {% if c.use_case %}
 
-<!-- ====================================================== -->
-<!-- SEARCH RESULTS -->
-<!-- ====================================================== -->
+        <p>
 
-{% for c in results %}
+            <b>
+                When to use:
+            </b>
 
-<div class="card">
+            {{ c.use_case }}
 
+        </p>
 
-<!-- Vendor / Platform / Risk -->
+        {% endif %}
 
-<div>
 
-<b>
-{{ c.vendor }}
-</b>
 
-·
+        <!-- Details -->
 
-{{ c.platform }}
+        <a href="/command/{{ c.id }}">
+            Open details →
+        </a>
 
-{% if c.risk %}
 
-<span class="risk {{ c.risk }}">
-{{ c.risk }}
-</span>
 
-{% endif %}
+        <!-- Nexus troubleshooting -->
 
-</div>
+        {% if c.platform == "Nexus NX-OS" %}
 
+        &nbsp; | &nbsp;
 
-<!-- Category -->
+        <a href="/troubleshoot/nexus">
+            Nexus troubleshooting →
+        </a>
 
-<small>
-{{ c.category }}
-</small>
+        {% endif %}
 
 
-<!-- Command title -->
 
-<h2>
-{{ c.title }}
-</h2>
+        <!-- F5 troubleshooting -->
 
+        {% if c.vendor == "F5" %}
 
-<!-- Command -->
+        &nbsp; | &nbsp;
 
-<pre>{{ c.command }}</pre>
+        <a href="/troubleshoot/f5">
+            F5 troubleshooting →
+        </a>
 
+        {% endif %}
 
-<!-- Description -->
 
-<p>
-{{ c.description }}
-</p>
+    </div>
 
 
-<!-- Use case -->
-
-{% if c.use_case %}
-
-<p>
-
-<b>
-When to use:
-</b>
-
-{{ c.use_case }}
-
-</p>
-
-{% endif %}
-
-
-<!-- Details -->
-
-<a href="/command/{{ c.id }}">
-Open details →
-</a>
-
-
-<!-- Nexus Troubleshooting Link -->
-
-{% if c.platform == "Nexus NX-OS" %}
-
-&nbsp; | &nbsp;
-
-<a href="/troubleshoot/nexus">
-Nexus Troubleshooting →
-</a>
-
-{% endif %}
-
-
-<!-- F5 Troubleshooting Link -->
-
-{% if c.vendor == "F5" %}
-
-&nbsp; | &nbsp;
-
-<a href="/troubleshoot/f5">
-F5 Troubleshooting →
-</a>
-
-{% endif %}
-
-
-</div>
-
-{% endfor %}
+    {% endfor %}
 
 
 </main>
 
+
+
+<!-- =====================================================
+     JAVASCRIPT
+
+     Handles:
+     - Light / Dark / System theme
+     - Theme persistence
+     - Copy CLI buttons
+===================================================== -->
 
 <script src="/static/app.js"></script>
 

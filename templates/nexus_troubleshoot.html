@@ -1,501 +1,1458 @@
 <!doctype html>
-<html>
+
+<html lang="en">
+
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cisco Nexus NX-OS Troubleshooting</title>
-<link rel="stylesheet" href="/static/style.css">
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>
+Cisco Nexus NX-OS Troubleshooting
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/style.css"
+>
+
 </head>
+
+
 <body>
-<nav>
-<b>Network Command Assistant</b>
-<span>
-<a href="/">Search</a>
-<a href="/compare">Compare</a>
-<a href="/device-finder">End Device Finder</a>
-<a href="/troubleshoot">Troubleshoot</a>
-</span>
-</nav>
+
+
+{% include "partials/navbar.html" %}
+
+
 <main>
-<h1>Cisco Nexus NX-OS Troubleshooting</h1>
+
+
+<section class="hero">
+
+<div class="hero-kicker">
+Cisco Nexus NX-OS · Diagnostic Workbench
+</div>
+
+<h1>
+Work from platform health to forwarding evidence.
+</h1>
+
 <p>
-Use a dependency-based workflow. Establish a baseline first, then narrow the
-problem before using disruptive actions.
+Start with safe operational checks. Narrow the failing dependency before using
+monitoring, debug, restart, or other disruptive actions.
 </p>
+
+<div class="status-line">
+
+<span class="status-chip">
+<strong>●</strong>
+NX-OS
+</span>
+
+<span class="status-chip">
+vPC + FEX + PERFORMANCE
+</span>
+
+<span class="status-chip">
+SAFE-FIRST
+</span>
+
+</div>
+
+</section>
+
+
+
 <div class="quick">
-<a href="#basic">Basic Health</a>
-<a href="#interfaces">Interfaces</a>
-<a href="#vpc">vPC</a>
-<a href="#fex">FEX</a>
-<a href="#fabricpath">FabricPath</a>
-<a href="#span">SPAN / ERSPAN</a>
-<a href="#cpu">High CPU</a>
-<a href="#memory">High Memory</a>
-<a href="#evidence">Evidence</a>
+
+<a href="#basic">
+BASIC
+</a>
+
+<a href="#interfaces">
+INTERFACES
+</a>
+
+<a href="#vpc">
+vPC
+</a>
+
+<a href="#fex">
+FEX
+</a>
+
+<a href="#fabricpath">
+FABRICPATH
+</a>
+
+<a href="#span">
+SPAN / ERSPAN
+</a>
+
+<a href="#cpu">
+HIGH CPU
+</a>
+
+<a href="#memory">
+HIGH MEMORY
+</a>
+
+<a href="#evidence">
+EVIDENCE
+</a>
+
 </div>
-<section id="basic">
-<h1>1. Basic Nexus Health</h1>
+
+
+
+<!-- =====================================================
+     01 BASIC HEALTH
+===================================================== -->
+
+<div
+    class="section-label"
+    id="basic"
+>
+01 · Basic Health
+</div>
+
+
 <div class="card">
-<h2>Start with context</h2>
-<p>Before blaming vPC, FEX, routing, CPU or memory, establish the switch baseline.</p>
-<h3>Version, model and uptime</h3>
+
+<h2>
+Establish the Nexus baseline
+</h2>
+
+<p>
+Before blaming vPC, FEX, routing, CPU, or memory,
+establish the overall health of the switch.
+</p>
+
+
+<h3>
+Version / model / uptime
+</h3>
+
+<div class="terminal-title">
+NX-OS CLI
+</div>
+
 <pre>show version</pre>
-<h3>Enabled features</h3>
+
+
+<h3>
+Enabled features
+</h3>
+
 <pre>show feature</pre>
-<h3>CPU and memory baseline</h3>
+
+
+<h3>
+CPU and memory baseline
+</h3>
+
 <pre>show system resources</pre>
-<h3>Interface overview</h3>
+
+
+<h3>
+Interface overview
+</h3>
+
 <pre>show interface status</pre>
-<h3>Port-channel overview</h3>
+
+
+<h3>
+Port-channel overview
+</h3>
+
 <pre>show port-channel summary</pre>
-<h3>VLAN state</h3>
+
+
+<h3>
+VLAN state
+</h3>
+
 <pre>show vlan</pre>
-<h3>Dynamic MAC learning in a VLAN</h3>
-<pre>show mac address-table dynamic vlan &lt;vlan-id&gt;</pre>
-<h3>Routing</h3>
+
+
+<h3>
+Routing table
+</h3>
+
 <pre>show ip route</pre>
+
+
 <p>
-Learning rule: one abnormal command is not automatically the root cause.
-Correlate it with the reported symptom and with other operational state.
+One abnormal counter does not automatically identify the root cause.
+Correlate the output with the reported symptom and the exact time of impact.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>Baseline decision flow</h2>
-<pre>
-Problem reported
-      |
-      v
-Is the switch healthy overall?
-      |
-      +--> CPU/memory abnormal? ---> Performance section
-      |
-      +--> Interface down/error? -> Interface section
-      |
-      +--> vPC/FEX symptom? ------> Relevant feature section
-      |
-      `--> No obvious platform problem
-                 |
-                 v
-         Follow packet/control-plane path
-</pre>
+
+<h2>
+Basic Troubleshooting Flow
+</h2>
+
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+SYMPTOM
+</strong>
+
+What exactly is failing?
+
 </div>
-</section>
-<section id="interfaces">
-<h1>2. Interface / Port-Channel / VLAN</h1>
+
+
+<div class="flow-step">
+
+<strong>
+BASELINE
+</strong>
+
+Is the Nexus switch healthy overall?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+DEPENDENCY
+</strong>
+
+Interface, port-channel, vPC, FEX, routing, CPU, or memory?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+EVIDENCE
+</strong>
+
+Narrow the problem to the failing layer.
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     02 INTERFACES / PORT CHANNEL / VLAN
+===================================================== -->
+
+<div
+    class="section-label"
+    id="interfaces"
+>
+02 · Interfaces / Port-Channel / VLAN
+</div>
+
+
 <div class="card">
-<h2>Interface status</h2>
+
+<h2>
+Interface Status
+</h2>
+
 <pre>show interface status</pre>
-<h3>Look for</h3>
+
+
+<h3>
+Look for
+</h3>
+
 <ul>
-<li>Connected versus notconnect/down state</li>
-<li>Expected VLAN or trunk behavior</li>
-<li>Speed/duplex/media context</li>
+
+<li>
+Connected versus down/notconnect state
+</li>
+
+<li>
+Expected VLAN or trunk state
+</li>
+
+<li>
+Speed and duplex
+</li>
+
+<li>
+Interface type
+</li>
+
 </ul>
+
 </div>
+
+
+
 <div class="card">
-<h2>Detailed interface check</h2>
+
+<h2>
+Detailed Interface Check
+</h2>
+
 <pre>show interface &lt;interface&gt;</pre>
-<h3>Look for</h3>
+
+
+<h3>
+Look for
+</h3>
+
 <ul>
-<li>Input/output errors and drops</li>
-<li>Link state</li>
-<li>Traffic counters</li>
-<li>Unexpected resets/flaps</li>
+
+<li>
+Input errors
+</li>
+
+<li>
+Output errors
+</li>
+
+<li>
+Drops
+</li>
+
+<li>
+Traffic counters
+</li>
+
+<li>
+Unexpected link resets or flaps
+</li>
+
 </ul>
+
 </div>
+
+
+
 <div class="card">
-<h2>Port-channel health</h2>
+
+<h2>
+Port-Channel Health
+</h2>
+
 <pre>show port-channel summary</pre>
-<h3>Look for</h3>
+
+
+<h3>
+Check
+</h3>
+
 <ul>
-<li>Port-channel state</li>
-<li>Expected protocol</li>
-<li>Member ports bundled/forwarding as expected</li>
-<li>Suspended or individual members</li>
+
+<li>
+Port-channel state
+</li>
+
+<li>
+LACP / protocol state
+</li>
+
+<li>
+Member interfaces
+</li>
+
+<li>
+Suspended members
+</li>
+
+<li>
+Members operating individually instead of bundled
+</li>
+
 </ul>
+
 </div>
+
+
+
 <div class="card">
-<h2>Layer-2 learning</h2>
+
+<h2>
+MAC Learning
+</h2>
+
 <pre>show mac address-table dynamic vlan &lt;vlan-id&gt;</pre>
+
 <p>
-If the expected MAC is not learned, work backward through VLAN membership,
-port state, downstream topology and the endpoint path.
+If the expected MAC address is missing, work backward through VLAN membership,
+interface state, downstream switches, and the endpoint connection.
 </p>
+
 </div>
-</section>
-<section id="vpc">
-<h1>3. vPC Troubleshooting</h1>
+
+
+
+<!-- =====================================================
+     03 vPC
+===================================================== -->
+
+<div
+    class="section-label"
+    id="vpc"
+>
+03 · vPC
+</div>
+
+
 <div class="card">
-<h2>First command</h2>
+
+<h2>
+vPC Topology
+</h2>
+
+
+<div class="topology">
+
+
+<div class="topology-row">
+
+<div class="node">
+
+<strong>
+NEXUS-01
+</strong>
+
+<small>
+vPC Peer
+</small>
+
+</div>
+
+
+<div
+    class="link"
+    data-label="PEER-LINK"
+>
+</div>
+
+
+<div class="node">
+
+<strong>
+NEXUS-02
+</strong>
+
+<small>
+vPC Peer
+</small>
+
+</div>
+
+</div>
+
+
+<br>
+
+
+<div class="topology-row">
+
+<div class="node">
+
+<strong>
+KEEPALIVE
+</strong>
+
+<small>
+L3 Reachability
+</small>
+
+</div>
+
+
+<div
+    class="link"
+    data-label="HEALTH CHECK"
+>
+</div>
+
+
+<div class="node">
+
+<strong>
+DOWNSTREAM
+</strong>
+
+<small>
+vPC Member
+</small>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Start with vPC Summary
+</h2>
+
 <pre>show vpc brief</pre>
-<h3>Read these fields first</h3>
+
+
+<h3>
+Read these fields first
+</h3>
+
 <ul>
-<li>vPC peer status</li>
-<li>Peer-link status</li>
-<li>Peer-keepalive status</li>
-<li>Configuration consistency</li>
-<li>Per-vPC/member state</li>
+
+<li>
+vPC peer status
+</li>
+
+<li>
+Peer-link status
+</li>
+
+<li>
+Peer-keepalive status
+</li>
+
+<li>
+Configuration consistency
+</li>
+
+<li>
+Individual vPC/member state
+</li>
+
 </ul>
+
 </div>
+
+
+
 <div class="card">
-<h2>Peer keepalive</h2>
+
+<h2>
+Peer Keepalive
+</h2>
+
 <pre>show vpc peer-keepalive</pre>
+
 <p>
-If keepalive is unhealthy, verify the configured VRF, source/destination
-addresses and underlying reachability before changing the vPC itself.
+If keepalive is unhealthy, verify the configured VRF,
+source/destination addresses, and the underlying Layer-3 reachability.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>vPC role</h2>
+
+<h2>
+vPC Role
+</h2>
+
 <pre>show vpc role</pre>
+
 <p>
-Use role information to understand primary/secondary behavior during failure
-conditions. Do not confuse role with normal active/active forwarding behavior.
+Use this to understand primary/secondary role behavior during failure scenarios.
+The normal vPC forwarding design is still active-active.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>Consistency</h2>
+
+<h2>
+Consistency Parameters
+</h2>
+
 <pre>show vpc consistency-parameters vpc &lt;vpc-id&gt;</pre>
-<h3>Also useful on supported releases</h3>
+
+<h3>
+Additional checks where supported
+</h3>
+
 <pre>show vpc consistency-parameters global</pre>
+
 <pre>show vpc consistency-parameters interface &lt;interface&gt;</pre>
+
 <pre>show vpc consistency-parameters vlans</pre>
+
+
 <p>
-Type-1 mismatches can suspend vPC operation and must be corrected.
-Do not blindly copy configuration from one peer to the other. Identify the
-specific mismatch, decide which configuration is intended, and change the
-correct side under change control.
+Do not blindly copy the configuration from one peer to the other.
+Identify the exact mismatch first and determine which side has the intended
+configuration.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>vPC dependency algorithm</h2>
-<pre>
-vPC problem
-   |
-   v
-show vpc brief
-   |
-   +-- Peer adjacency bad?
-   |       |
-   |       v
-   |   Check peer-link / port-channel / interfaces
-   |
-   +-- Keepalive bad?
-   |       |
-   |       v
-   |   Verify VRF/IP reachability
-   |
-   +-- Consistency failed?
-   |       |
-   |       v
-   |   Compare consistency parameters
-   |
-   +-- Member suspended/down?
-   |       |
-   |       v
-   |   show port-channel summary + interface state
-   |
-   `-- VLAN-specific issue?
-           |
-           v
-       VLAN / STP / allowed VLAN consistency
-</pre>
-</div>
-</section>
-<section id="fex">
-<h1>4. FEX Troubleshooting</h1>
-<div class="card">
-<h2>Feature state</h2>
-<pre>show feature | include fex</pre>
-<h3>Operational state</h3>
-<pre>show fex</pre>
-<h3>Detailed FEX information</h3>
-<pre>show fex &lt;fex-id&gt; detail</pre>
-</div>
-<div class="card">
-<h2>FEX reasoning path</h2>
-<pre>
-FEX issue
-  |
-  v
-Is FEX feature enabled?
-  |
-  v
-Is FEX discovered / online?
-  |
-  v
-Are fabric/uplink interfaces healthy?
-  |
-  v
-Are FEX host interfaces visible and up?
-  |
-  v
-Check pinning/uplink relationship
-  |
-  v
-Correlate physical state and logs
-</pre>
-</div>
-<p>
-Workbook note: the uploaded Nexus workbook contains FEX discovery, detailed
-verification, host-port mapping and pinning scenarios. Use it for lab context,
-then verify exact syntax/behavior against the NX-OS release used in production.
-</p>
-</section>
-<section id="fabricpath">
-<h1>5. FabricPath (Installed / Legacy Environments)</h1>
-<div class="card">
-<h2>IS-IS interfaces</h2>
-<pre>show fabricpath isis interface brief</pre>
-<h2>Adjacency</h2>
-<pre>show fabricpath isis adjacency</pre>
-<h2>Switch IDs</h2>
-<pre>show fabricpath switch-id</pre>
-<h2>FabricPath route table</h2>
-<pre>show fabricpath route</pre>
-</div>
-<div class="card">
-<h2>FabricPath troubleshooting order</h2>
-<pre>
-FabricPath reachability issue
-       |
-       v
-Interface in correct FabricPath mode?
-       |
-       v
-IS-IS adjacency formed?
-       |
-       v
-Switch IDs correct/unique?
-       |
-       v
-Route table contains expected path?
-       |
-       v
-VLAN/MAC learning and endpoint path
-</pre>
-</div>
-<p>
-Treat FabricPath as environment-specific. Preserve it because the workbook
-contains it, but do not assume modern Nexus networks universally use FabricPath.
-</p>
-</section>
-<section id="span">
-<h1>6. SPAN / ERSPAN</h1>
-<div class="card">
-<h2>Verify monitor sessions</h2>
-<pre>show monitor session</pre>
-<pre>show monitor session &lt;session-id&gt;</pre>
-<p>
-Use SPAN/ERSPAN after simpler operational checks when packet evidence is needed.
-The workbook describes SPAN as copying source port/VLAN traffic to an analyzer
-and ERSPAN as transporting monitored traffic across Layer 3 using GRE.
-</p>
-</div>
-<div class="card">
-<h2>Evidence-collection rule</h2>
-<pre>
-Symptom
-  |
-  v
-Operational state checks
-  |
-  v
-Form a specific packet hypothesis
-  |
-  v
-Configure/verify SPAN or ERSPAN
-  |
-  v
-Capture only required traffic
-  |
-  v
-Analyze
-  |
-  v
-Remove/disable temporary monitoring configuration if no longer required
-</pre>
-</div>
-</section>
-<section id="cpu">
-<h1>7. High CPU Troubleshooting</h1>
-<div class="card">
-<h2>Step 1 - Confirm overall CPU and load</h2>
-<pre>show system resources</pre>
-<h3>Ask</h3>
-<ul>
-<li>Is CPU actually high now?</li>
-<li>Is load above the normal baseline for this switch?</li>
-<li>Is there user/service impact?</li>
-</ul>
-</div>
-<div class="card">
-<h2>Step 2 - Determine spike versus sustained utilization</h2>
-<pre>show processes cpu history</pre>
-<p>
-A spike alone is not automatically a fault. Investigate when utilization is
-sustained, repeatedly abnormal relative to baseline, tied to service impact, or
-owned by a persistently busy process.
-</p>
-</div>
-<div class="card">
-<h2>Step 3 - Identify the CPU-consuming process</h2>
-<pre>show processes cpu</pre>
-<h3>Optional on supported releases</h3>
-<pre>show processes cpu sort</pre>
-<p>
-Do not restart a process merely because its name is at the top once.
-Sample repeatedly and correlate with the time of the reported problem.
-</p>
-</div>
-<div class="card">
-<h2>Step 4 - Correlate process with network behavior</h2>
-<pre>
-High CPU
-   |
-   v
-Which process owns it?
-   |
-   +-- Routing/control plane
-   |      |
-   |      v
-   |   BGP/OSPF adjacency or route churn?
-   |   Interface flaps?
-   |   Redistribution/topology changes?
-   |
-   +-- Layer 2 / vPC / STP
-   |      |
-   |      v
-   |   Topology changes?
-   |   MAC churn?
-   |   vPC/member instability?
-   |
-   +-- Management
-   |      |
-   |      v
-   |   SNMP/CLI/logging/telemetry activity?
-   |
-   `-- Unknown/system
-          |
-          v
-      Logs + evidence + Cisco support investigation
-</pre>
-</div>
-<div class="card">
-<h2>Step 5 - Correlate logs and topology</h2>
-<pre>show logging logfile</pre>
-<pre>show interface status</pre>
-<pre>show port-channel summary</pre>
+
+<h2>
+vPC Troubleshooting Flow
+</h2>
+
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+1. SUMMARY
+</strong>
+
 <pre>show vpc brief</pre>
+
+Identify which dependency is unhealthy.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+2. PEER-LINK
+</strong>
+
+If peer adjacency is unhealthy, verify port-channel and member interfaces.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+3. KEEPALIVE
+</strong>
+
+If keepalive is unhealthy, verify VRF and IP reachability.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+4. CONSISTENCY
+</strong>
+
+Identify the exact configuration mismatch.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+5. MEMBER
+</strong>
+
+Verify port-channel, interface, VLAN, and STP state.
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     04 FEX
+===================================================== -->
+
+<div
+    class="section-label"
+    id="fex"
+>
+04 · FEX
+</div>
+
+
+<div class="card">
+
+<h2>
+Check FEX Feature State
+</h2>
+
+<pre>show feature | include fex</pre>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+FEX Operational State
+</h2>
+
+<pre>show fex</pre>
+
+
+<h3>
+Detailed FEX Information
+</h3>
+
+<pre>show fex &lt;fex-id&gt; detail</pre>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+FEX Troubleshooting Flow
+</h2>
+
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+FEATURE
+</strong>
+
+Is FEX enabled?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+DISCOVERY
+</strong>
+
+Is the FEX discovered and online?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+FABRIC LINK
+</strong>
+
+Are the parent-switch uplinks healthy?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+HOST PORTS
+</strong>
+
+Are FEX front-panel interfaces visible and operational?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+PINNING
+</strong>
+
+Verify the fabric-interface and pinning relationship.
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     05 FABRICPATH
+===================================================== -->
+
+<div
+    class="section-label"
+    id="fabricpath"
+>
+05 · FabricPath
+</div>
+
+
+<div class="card">
+
+<h2>
+FabricPath IS-IS Interfaces
+</h2>
+
+<pre>show fabricpath isis interface brief</pre>
+
+
+<h2>
+FabricPath Adjacency
+</h2>
+
+<pre>show fabricpath isis adjacency</pre>
+
+
+<h2>
+FabricPath Switch IDs
+</h2>
+
+<pre>show fabricpath switch-id</pre>
+
+
+<h2>
+FabricPath Routing Table
+</h2>
+
+<pre>show fabricpath route</pre>
+
+
 <p>
-Choose follow-up commands based on the process and symptom. Do not run every
-command indiscriminately.
+FabricPath is environment-specific and is more common in older Nexus designs.
+Use this section only where FabricPath is actually deployed.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>High CPU algorithm to memorize</h2>
-<pre>
-SYMPTOM: High CPU
-    |
-    v
-1. show system resources
-    |
-    v
-2. spike or sustained?
-   show processes cpu history
-    |
-    v
-3. which process?
-   show processes cpu
-    |
-    v
-4. map process to network function
-    |
-    v
-5. correlate logs/interfaces/routing/vPC
-    |
-    v
-6. collect evidence
-    |
-    v
-7. corrective action or escalation
-</pre>
+
+<h2>
+FabricPath Troubleshooting Flow
+</h2>
+
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+INTERFACE
+</strong>
+
+Is the interface in the expected FabricPath mode?
+
 </div>
-</section>
-<section id="memory">
-<h1>8. High Memory Troubleshooting</h1>
+
+
+<div class="flow-step">
+
+<strong>
+ADJACENCY
+</strong>
+
+Is the IS-IS adjacency established?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+SWITCH ID
+</strong>
+
+Are switch IDs correct and unique?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+ROUTE
+</strong>
+
+Does the FabricPath routing table contain the expected path?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+ENDPOINT
+</strong>
+
+Verify VLAN and MAC learning.
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     06 SPAN / ERSPAN
+===================================================== -->
+
+<div
+    class="section-label"
+    id="span"
+>
+06 · SPAN / ERSPAN
+</div>
+
+
 <div class="card">
-<h2>Step 1 - Establish memory baseline</h2>
+
+<h2>
+Monitor Sessions
+</h2>
+
+<pre>show monitor session</pre>
+
+<pre>show monitor session &lt;session-id&gt;</pre>
+
+
+<p>
+Use SPAN or ERSPAN when packet-level evidence is required after simpler
+operational checks have narrowed the problem.
+</p>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Packet Evidence Workflow
+</h2>
+
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+SYMPTOM
+</strong>
+
+Define the traffic problem.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+HYPOTHESIS
+</strong>
+
+Decide what packet behavior you need to prove.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+MONITOR
+</strong>
+
+Configure and verify SPAN / ERSPAN.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+CAPTURE
+</strong>
+
+Capture only the relevant traffic.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+ANALYZE
+</strong>
+
+Use Wireshark or another packet-analysis tool.
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     07 HIGH CPU
+===================================================== -->
+
+<div
+    class="section-label"
+    id="cpu"
+>
+07 · High CPU
+</div>
+
+
+<div class="card">
+
+<h2>
+High CPU Troubleshooting Flow
+</h2>
+
+
+<div class="flow">
+
+
+<div class="flow-step">
+
+<strong>
+1. CONFIRM
+</strong>
+
+Is CPU actually high now?
+
 <pre>show system resources</pre>
+
 </div>
-<div class="card">
-<h2>Step 2 - Inspect process memory</h2>
-<pre>show processes memory</pre>
+
+
+<div class="flow-step">
+
+<strong>
+2. TREND
+</strong>
+
+Is this a short spike or sustained utilization?
+
+<pre>show processes cpu history</pre>
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+3. IDENTIFY PROCESS
+</strong>
+
+Which process is consuming CPU?
+
+<pre>show processes cpu</pre>
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+4. CORRELATE
+</strong>
+
+Match the process to the network function.
+
 <p>
-Cisco's Nexus 9000 troubleshooting guidance emphasizes that high-level memory
-utilization alone does not tell you what type of memory is high. First
-distinguish process memory, page cache and kernel memory before choosing
-advanced diagnostics.
+Routing churn? Interface flap? vPC/STP event?
+Management polling or excessive logging?
 </p>
+
 </div>
-<div class="card">
-<h2>Step 3 - Ask trend questions</h2>
-<ul>
-<li>Is memory stable at a high but normal baseline?</li>
-<li>Is used memory increasing over hours/days?</li>
-<li>Is one process growing continuously?</li>
-<li>Did growth begin after a configuration/software/feature change?</li>
-<li>Are processes restarting or OOM/service-failure messages present?</li>
-</ul>
-</div>
-<div class="card">
-<h2>Step 4 - Correlate logs</h2>
+
+
+<div class="flow-step">
+
+<strong>
+5. COLLECT EVIDENCE
+</strong>
+
+Correlate logs and feature state.
+
 <pre>show logging logfile</pre>
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+6. ACT
+</strong>
+
+Correct the verified cause or escalate with evidence.
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Step 1 · Confirm CPU and Load
+</h2>
+
+<pre>show system resources</pre>
+
+
+<h3>
+Ask
+</h3>
+
+<ul>
+
+<li>
+Is CPU actually high right now?
+</li>
+
+<li>
+Is it higher than the normal baseline?
+</li>
+
+<li>
+Is there application or control-plane impact?
+</li>
+
+</ul>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Step 2 · Spike or Sustained?
+</h2>
+
+<pre>show processes cpu history</pre>
+
 <p>
-Advanced memory commands differ by release and memory type. Use Cisco's
-troubleshooting guide for the exact release once you determine whether the
-increase is process, page-cache or kernel related.
+A short CPU spike is not automatically a fault.
+Focus on sustained or repeatedly abnormal utilization that correlates with
+service impact.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>High memory algorithm to memorize</h2>
-<pre>
-SYMPTOM: High memory
-    |
-    v
-1. show system resources
-    |
-    v
-2. show processes memory
-    |
-    v
-3. stable baseline or increasing trend?
-    |
-    v
-4. process / page cache / kernel?
-    |
-    v
-5. correlate logs + recent change + uptime
-    |
-    v
-6. collect evidence before reboot/restart
-    |
-    v
-7. release-specific Cisco procedure / escalation
-</pre>
-</div>
-<div class="card">
-<h2>Important caution</h2>
+
+<h2>
+Step 3 · Identify the Process
+</h2>
+
+<pre>show processes cpu</pre>
+
+<h3>
+Optional where supported
+</h3>
+
+<pre>show processes cpu sort</pre>
+
 <p>
-Do not teach "memory is 80% used, therefore reboot". Linux/NX-OS memory
-accounting can include memory used for caches and other system functions.
-Evidence and trend matter more than a single percentage.
+Sample more than once.
+Do not restart a process just because it appears high in one snapshot.
 </p>
+
 </div>
-</section>
-<section id="evidence">
-<h1>9. Evidence Collection and Escalation</h1>
+
+
+
 <div class="card">
-<h2>Minimum evidence package</h2>
+
+<h2>
+CPU Correlation Logic
+</h2>
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+ROUTING PROCESS
+</strong>
+
+Check BGP/OSPF adjacency changes, route churn, interface flaps,
+redistribution or topology changes.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+LAYER 2 / vPC / STP
+</strong>
+
+Check topology changes, MAC churn, port-channel and vPC/member instability.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+MANAGEMENT
+</strong>
+
+Check SNMP polling, telemetry, CLI load or excessive logging.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+UNKNOWN / SYSTEM
+</strong>
+
+Collect logs and evidence before escalation.
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     08 HIGH MEMORY
+===================================================== -->
+
+<div
+    class="section-label"
+    id="memory"
+>
+08 · High Memory
+</div>
+
+
+<div class="card">
+
+<h2>
+High Memory Troubleshooting Flow
+</h2>
+
+
+<div class="flow">
+
+
+<div class="flow-step">
+
+<strong>
+1. BASELINE
+</strong>
+
+Confirm the current memory state.
+
+<pre>show system resources</pre>
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+2. PROCESS MEMORY
+</strong>
+
+Identify which processes are using memory.
+
+<pre>show processes memory</pre>
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+3. TREND
+</strong>
+
+Is memory stable at a normal baseline,
+or continuously increasing?
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+4. CLASSIFY
+</strong>
+
+Determine whether the growth appears related to process memory,
+cache, kernel/system usage, or another platform-specific memory category.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+5. CORRELATE
+</strong>
+
+Check recent software changes, configuration changes,
+uptime, and logs.
+
+<pre>show logging logfile</pre>
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+6. COLLECT EVIDENCE
+</strong>
+
+Record memory state, process usage,
+uptime, incident time, and recent changes.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+7. ACT
+</strong>
+
+Use release-specific Cisco diagnostics,
+correct the verified cause,
+or escalate with evidence.
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Memory Baseline
+</h2>
+
+<pre>show system resources</pre>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Process Memory Usage
+</h2>
+
+<pre>show processes memory</pre>
+
+
+<p>
+High overall memory utilization alone does not prove a memory leak.
+Trend and process ownership matter.
+</p>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+Questions to Ask
+</h2>
+
+<ul>
+
+<li>
+Is memory stable at this level?
+</li>
+
+<li>
+Is memory continuously growing over hours or days?
+</li>
+
+<li>
+Is one process growing?
+</li>
+
+<li>
+Did the issue begin after a software, feature, or configuration change?
+</li>
+
+<li>
+Are there process restarts or memory-related log messages?
+</li>
+
+</ul>
+
+</div>
+
+
+
+<!-- =====================================================
+     09 EVIDENCE COLLECTION
+===================================================== -->
+
+<div
+    class="section-label"
+    id="evidence"
+>
+09 · Evidence Collection
+</div>
+
+
+<div class="card">
+
+<h2>
+Minimum Nexus Evidence Package
+</h2>
+
 <pre>show version
 show system resources
 show processes cpu
@@ -505,48 +1462,133 @@ show logging logfile
 show interface status
 show port-channel summary
 show vpc brief</pre>
+
+
 <p>
-Add protocol- or feature-specific outputs only when relevant. Record the exact
-time of the problem so logs and CPU history can be correlated.
+Add routing, FEX, FabricPath, or other feature-specific output only when the
+symptom points to that area.
 </p>
+
 </div>
+
+
+
 <div class="card">
-<h2>Before disruptive action</h2>
+
+<h2>
+Before a Disruptive Action
+</h2>
+
 <ul>
-<li>Record symptom and business impact.</li>
-<li>Capture current CPU/memory/process state.</li>
-<li>Capture relevant vPC/interface/routing state.</li>
-<li>Record recent changes.</li>
-<li>Save logs/evidence.</li>
-<li>Confirm the approved recovery/change plan.</li>
+
+<li>
+Record the symptom.
+</li>
+
+<li>
+Record business/application impact.
+</li>
+
+<li>
+Capture CPU and memory state.
+</li>
+
+<li>
+Capture relevant interface/vPC/routing state.
+</li>
+
+<li>
+Record recent changes.
+</li>
+
+<li>
+Collect logs.
+</li>
+
+<li>
+Confirm the approved recovery/change plan.
+</li>
+
 </ul>
+
 </div>
+
+
+
 <div class="card">
-<h2>Core engineering habit</h2>
-<pre>
-Observe
-  |
-  v
-Measure
-  |
-  v
-Correlate
-  |
-  v
-Hypothesize
-  |
-  v
-Test safely
-  |
-  v
-Collect evidence
-  |
-  v
-Correct or escalate
-</pre>
+
+<h2>
+Network Engineer Troubleshooting Mindset
+</h2>
+
+
+<div class="flow">
+
+<div class="flow-step">
+
+<strong>
+OBSERVE
+</strong>
+
+Define the symptom and impact.
+
 </div>
-</section>
+
+
+<div class="flow-step">
+
+<strong>
+MEASURE
+</strong>
+
+Establish objective current state.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+CORRELATE
+</strong>
+
+Tie the abnormal state to a dependency or event.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+PROVE
+</strong>
+
+Collect evidence before disruptive changes.
+
+</div>
+
+
+<div class="flow-step">
+
+<strong>
+CORRECT / ESCALATE
+</strong>
+
+Act based on evidence, not assumptions.
+
+</div>
+
+</div>
+
+</div>
+
+
 </main>
+
+
 <script src="/static/app.js"></script>
+
+
 </body>
+
 </html>

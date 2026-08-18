@@ -1,43 +1,152 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    document.querySelectorAll("pre").forEach(function (block) {
+    // ======================================================
+    // THEME
+    // ======================================================
 
-        const text = block.innerText.trim();
+    const savedTheme =
+        localStorage.getItem("network-assistant-theme") || "system";
 
-        if (!text) {
-            return;
+    const root = document.documentElement;
+
+    function applyTheme(theme) {
+
+        if (theme === "system") {
+            root.setAttribute("data-theme", "system");
+        } else {
+            root.setAttribute("data-theme", theme);
         }
 
-        const button = document.createElement("button");
+        localStorage.setItem(
+            "network-assistant-theme",
+            theme
+        );
+    }
 
-        button.type = "button";
-        button.className = "copy-btn";
-        button.innerText = "Copy";
 
-        button.addEventListener("click", async function () {
+    applyTheme(savedTheme);
 
-            try {
 
-                await navigator.clipboard.writeText(text);
+    const themeSelect =
+        document.getElementById("theme-select");
 
-                button.innerText = "Copied ✓";
-                button.classList.add("copied");
 
-                setTimeout(function () {
-                    button.innerText = "Copy";
-                    button.classList.remove("copied");
-                }, 1500);
+    if (themeSelect) {
 
-            } catch (error) {
+        themeSelect.value = savedTheme;
 
-                button.innerText = "Copy failed";
+        themeSelect.addEventListener(
+            "change",
+            function () {
+
+                applyTheme(
+                    themeSelect.value
+                );
 
             }
+        );
+    }
+
+
+    // ======================================================
+    // COPY COMMAND BUTTONS
+    // ======================================================
+
+    document
+        .querySelectorAll("pre")
+        .forEach(function (block) {
+
+            const text =
+                block.innerText.trim();
+
+
+            if (!text) {
+                return;
+            }
+
+
+            // Avoid adding Copy to large diagrams / flows
+            const looksLikeDiagram =
+                text.includes("↓") ||
+                text.includes("┌") ||
+                text.includes("└") ||
+                text.includes("├") ||
+                text.includes("│") ||
+                text.split("\n").length > 9;
+
+
+            if (looksLikeDiagram) {
+                return;
+            }
+
+
+            const button =
+                document.createElement("button");
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "copy-btn";
+
+
+            button.innerText =
+                "COPY CLI";
+
+
+            button.addEventListener(
+                "click",
+                async function () {
+
+                    try {
+
+                        await navigator.clipboard.writeText(
+                            text
+                        );
+
+
+                        button.innerText =
+                            "COPIED ✓";
+
+
+                        button.classList.add(
+                            "copied"
+                        );
+
+
+                        setTimeout(
+                            function () {
+
+                                button.innerText =
+                                    "COPY CLI";
+
+
+                                button.classList.remove(
+                                    "copied"
+                                );
+
+                            },
+                            1500
+                        );
+
+                    } catch (error) {
+
+                        button.innerText =
+                            "COPY FAILED";
+
+                    }
+
+                }
+            );
+
+
+            block.insertAdjacentElement(
+                "afterend",
+                button
+            );
 
         });
-
-        block.insertAdjacentElement("afterend", button);
-
-    });
 
 });

@@ -1,3 +1,9 @@
 .venv/
 __pycache__/
 *.pyc
+commands-before-f5.json
+commands-before-nexus.json
+commands_f5_bigip.json
+commands_nexus_workbook.json
+merge_f5_commands.py
+merge_nexus_commands.py

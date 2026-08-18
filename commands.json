@@ -242,5 +242,1799 @@
       "ipsec",
       "phase1"
     ]
+  },
+  {
+    "id": 7001,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Show license files",
+    "command": "show license brief",
+    "description": "Displays installed license files.",
+    "use_case": "Use when checking which license files are present.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "brief"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7002,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Show license usage",
+    "command": "show license usage",
+    "description": "Displays licensed feature usage and state.",
+    "use_case": "Use when checking whether licensed features are installed or in use.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "usage"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7003,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Show license details",
+    "command": "show license",
+    "description": "Displays detailed license information.",
+    "use_case": "Use for detailed license inspection.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "details"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7004,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Show license host ID",
+    "command": "show license host-id",
+    "description": "Displays the unique license host ID.",
+    "use_case": "Use when identifying the switch host ID for licensing.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "host id"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7005,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Find license files in bootflash",
+    "command": "dir bootflash: | include .lic",
+    "description": "Filters bootflash for .lic files.",
+    "use_case": "Use to locate Nexus license files.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "bootflash",
+      ".lic"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7006,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Install license",
+    "command": "install license bootflash:<license-file>.lic",
+    "description": "Installs a license file from bootflash.",
+    "use_case": "Use only when intentionally installing a valid license.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "install"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7007,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Back up installed licenses",
+    "command": "copy licenses bootflash:<backup-name>.tar",
+    "description": "Copies installed licenses to a tar archive.",
+    "use_case": "Use before license changes or for backup.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "backup",
+      "tar"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7008,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Extract license archive",
+    "command": "tar extract bootflash:<backup-name>.tar",
+    "description": "Extracts a tar archive from bootflash.",
+    "use_case": "Use when restoring or extracting backed-up licenses.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "tar",
+      "extract"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7009,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Clear license",
+    "command": "clear license <license-file>.lic",
+    "description": "Clears a license from the switch.",
+    "use_case": "Use only when intentionally uninstalling a license.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "clear"
+    ],
+    "risk": "disruptive",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7010,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Update license",
+    "command": "update license bootflash:<new-file>.lic <existing-file>.lic",
+    "description": "Updates an existing license using a replacement file.",
+    "use_case": "Use only with the correct updated license file.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "update"
+    ],
+    "risk": "disruptive",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7011,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Licensing",
+    "title": "Enable grace period",
+    "command": "license grace-period",
+    "description": "Enables the license grace period.",
+    "use_case": "Use when intentionally enabling license grace period.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "license",
+      "grace period"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7012,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Features",
+    "title": "Show features",
+    "command": "show feature",
+    "description": "Displays feature state in NX-OS.",
+    "use_case": "Use to verify whether features are enabled or disabled.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "feature"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7013,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Features",
+    "title": "Enable interface-vlan",
+    "command": "feature interface-vlan",
+    "description": "Enables interface-vlan.",
+    "use_case": "Use before SVI functionality where required.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "feature",
+      "interface-vlan",
+      "svi"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7014,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Features",
+    "title": "Enable EIGRP",
+    "command": "feature eigrp",
+    "description": "Enables EIGRP.",
+    "use_case": "Use before EIGRP configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "feature",
+      "eigrp"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7015,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Features",
+    "title": "Enable OSPF",
+    "command": "feature ospf",
+    "description": "Enables OSPF.",
+    "use_case": "Use before OSPF configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "feature",
+      "ospf"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7016,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Features",
+    "title": "Show feature sets",
+    "command": "show feature-set",
+    "description": "Displays feature-set state.",
+    "use_case": "Use to verify feature-set status.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "feature-set"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7017,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Features",
+    "title": "Enable fabric feature-set",
+    "command": "feature-set fabric",
+    "description": "Enables the fabric feature-set.",
+    "use_case": "Use only when intentionally enabling the feature-set.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "feature-set",
+      "fabric"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7020,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Interface",
+    "title": "Show interface status",
+    "command": "show interface status",
+    "description": "Displays port status, VLAN, duplex, speed, and type.",
+    "use_case": "Use as a first interface health check.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "interface",
+      "port",
+      "status"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7021,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "VRF",
+    "title": "Show VRFs",
+    "command": "show vrf",
+    "description": "Displays configured VRFs and state.",
+    "use_case": "Use when checking VRF existence and state.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vrf"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7022,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Check Telnet feature",
+    "command": "show feature | include telnet",
+    "description": "Shows Telnet feature state.",
+    "use_case": "Use to verify whether Telnet is enabled.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "telnet",
+      "feature"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7023,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Show Telnet server",
+    "command": "show telnet server",
+    "description": "Displays Telnet service state.",
+    "use_case": "Use to confirm Telnet server status.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "telnet",
+      "server"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7024,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Enable Telnet",
+    "command": "feature telnet",
+    "description": "Enables Telnet.",
+    "use_case": "Use only when Telnet is intentionally required.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "telnet"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7025,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Check SSH feature",
+    "command": "show feature | include ssh",
+    "description": "Shows SSH feature state.",
+    "use_case": "Use to verify whether SSH is enabled.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "ssh",
+      "feature"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7026,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Show SSH server",
+    "command": "show ssh server",
+    "description": "Displays SSH server status/version.",
+    "use_case": "Use when checking SSH service state.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "ssh",
+      "server"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7027,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Show SSH key",
+    "command": "show ssh key",
+    "description": "Displays SSH key details.",
+    "use_case": "Use when verifying SSH key properties.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "ssh",
+      "rsa",
+      "key"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7028,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Generate RSA key 2048",
+    "command": "ssh key rsa 2048 force",
+    "description": "Regenerates a 2048-bit RSA key as shown in the workbook.",
+    "use_case": "Use only in a controlled SSH-key replacement workflow.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "ssh",
+      "rsa",
+      "2048"
+    ],
+    "risk": "disruptive",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7029,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Management",
+    "title": "Show user accounts",
+    "command": "show user-account",
+    "description": "Displays local user accounts and roles.",
+    "use_case": "Use to audit local users.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "user",
+      "account",
+      "role"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7030,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "System",
+    "title": "Show chassis model",
+    "command": "show version | include Chassis",
+    "description": "Filters version output for chassis model.",
+    "use_case": "Use to identify Nexus chassis model.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "version",
+      "chassis",
+      "model"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7031,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "System",
+    "title": "Show running image",
+    "command": "show version | include image",
+    "description": "Shows kickstart/system image information.",
+    "use_case": "Use to identify running Nexus images.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "version",
+      "image",
+      "kickstart"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7032,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Configuration",
+    "title": "Save configuration",
+    "command": "copy running-config startup-config",
+    "description": "Saves running configuration to startup configuration.",
+    "use_case": "Use after approved configuration changes.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "save",
+      "copy run start"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7033,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Configuration",
+    "title": "Show running configuration",
+    "command": "show running-config",
+    "description": "Displays active configuration.",
+    "use_case": "Use to inspect current configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "show run",
+      "running-config"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7034,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Configuration",
+    "title": "Show startup configuration",
+    "command": "show startup-config",
+    "description": "Displays saved startup configuration.",
+    "use_case": "Use to inspect saved configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "startup-config"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7035,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Configuration",
+    "title": "Erase startup configuration",
+    "command": "write erase",
+    "description": "Erases startup configuration.",
+    "use_case": "Use only for intentional reset/rebuild.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "write erase",
+      "startup-config"
+    ],
+    "risk": "disruptive",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7036,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "System",
+    "title": "Reload switch",
+    "command": "reload all",
+    "description": "Reloads the system and FEX modules in the workbook example.",
+    "use_case": "Use only during an approved maintenance window.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "reload",
+      "reboot"
+    ],
+    "risk": "disruptive",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7040,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Port Profile",
+    "title": "Show port profiles",
+    "command": "show port-profile brief",
+    "description": "Displays port-profile summary.",
+    "use_case": "Use to inspect defined port profiles.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "port-profile"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7041,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Port Profile",
+    "title": "Show named port profile",
+    "command": "show port-profile name <profile-name>",
+    "description": "Displays one port-profile.",
+    "use_case": "Use to verify profile state and content.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "port-profile",
+      "profile"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7042,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Port Profile",
+    "title": "Enable port profile",
+    "command": "state enabled",
+    "description": "Enables a port-profile from profile configuration mode.",
+    "use_case": "Use when activating a prepared profile.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "port-profile",
+      "state"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7043,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Port Profile",
+    "title": "Apply port profile",
+    "command": "inherit port-profile <profile-name>",
+    "description": "Applies a port-profile to an interface.",
+    "use_case": "Use when attaching a profile to an interface.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "port-profile",
+      "inherit"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7044,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Port Profile",
+    "title": "Expand port profile",
+    "command": "show port-profile expand-interface name <profile-name>",
+    "description": "Shows effective interface configuration inherited from a profile.",
+    "use_case": "Use to verify profile application.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "port-profile",
+      "expand-interface"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7050,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FEX",
+    "title": "Enable FEX feature",
+    "command": "feature fex",
+    "description": "Enables FEX support.",
+    "use_case": "Use before FEX configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fex",
+      "fabric extender"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7051,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FEX",
+    "title": "Show FEX status",
+    "command": "show fex",
+    "description": "Displays FEX discovery and operational state.",
+    "use_case": "Use to verify whether a FEX is discovered or online.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fex",
+      "status"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7052,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FEX",
+    "title": "Show FEX details",
+    "command": "show fex <fex-id> detail",
+    "description": "Displays detailed FEX state and mappings.",
+    "use_case": "Use for detailed FEX troubleshooting.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fex",
+      "detail"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7053,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FEX",
+    "title": "Show specific FEX",
+    "command": "show fex <fex-id>",
+    "description": "Displays information about one FEX.",
+    "use_case": "Use to verify one FEX.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fex"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7054,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FEX",
+    "title": "Show FEX host ports",
+    "command": "show interface status | include Eth<fex-id>/",
+    "description": "Filters interface status for FEX front-panel ports.",
+    "use_case": "Use to inspect FEX host-facing interfaces.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fex",
+      "interface"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7055,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FEX",
+    "title": "Redistribute FEX pinning",
+    "command": "fex pinning redistribute <fex-id>",
+    "description": "Requests FEX pinning redistribution.",
+    "use_case": "Use only during intentional FEX pinning changes.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fex",
+      "pinning"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7060,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Show vPC summary",
+    "command": "show vpc brief",
+    "description": "Displays vPC domain, peer, keepalive, consistency, peer-link and member status.",
+    "use_case": "Use as the first command for vPC troubleshooting.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "peer-link",
+      "keepalive"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7061,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Show peer keepalive",
+    "command": "show vpc peer-keepalive",
+    "description": "Displays vPC keepalive state and parameters.",
+    "use_case": "Use when peer keepalive is down or unstable.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "keepalive"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7062,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Show consistency parameters",
+    "command": "show vpc consistency-parameters vpc <vpc-id>",
+    "description": "Compares vPC consistency parameters.",
+    "use_case": "Use when a vPC is down or suspended due to mismatch.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "consistency"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7063,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Show vPC role",
+    "command": "show vpc role",
+    "description": "Displays primary and secondary vPC roles.",
+    "use_case": "Use during vPC failure analysis.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "role"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7064,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Port Channel",
+    "title": "Show port-channel summary",
+    "command": "show port-channel summary",
+    "description": "Displays port-channel and member state.",
+    "use_case": "Use to verify LACP/port-channel health.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "port-channel",
+      "lacp"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7065,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Enable vPC feature",
+    "command": "feature vpc",
+    "description": "Enables vPC.",
+    "use_case": "Use before vPC configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "feature"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7066,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Set vPC peer-link",
+    "command": "vpc peer-link",
+    "description": "Marks a port-channel as vPC peer-link.",
+    "use_case": "Use only on the intended peer-link port-channel.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "peer-link"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7067,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "vPC",
+    "title": "Assign vPC ID",
+    "command": "vpc <vpc-id>",
+    "description": "Associates a downstream port-channel with a vPC ID.",
+    "use_case": "Use when building a vPC member port-channel.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "vpc",
+      "port-channel"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7070,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Show FabricPath IS-IS interfaces",
+    "command": "show fabricpath isis interface brief",
+    "description": "Displays FabricPath IS-IS interface state and metrics.",
+    "use_case": "Use to verify FabricPath interface readiness.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "isis",
+      "interface"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7071,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Show FabricPath adjacency",
+    "command": "show fabricpath isis adjacency",
+    "description": "Displays FabricPath IS-IS adjacencies.",
+    "use_case": "Use when checking FabricPath neighbors.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "isis",
+      "adjacency"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7072,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Show FabricPath switch IDs",
+    "command": "show fabricpath switch-id",
+    "description": "Displays FabricPath switch-ID table.",
+    "use_case": "Use to verify learned/local switch IDs.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "switch-id"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7073,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Show local FabricPath switch ID",
+    "command": "show fabricpath switch-id local",
+    "description": "Displays the local FabricPath switch ID.",
+    "use_case": "Use to verify a configured local switch ID.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "switch-id",
+      "local"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7074,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Show FabricPath routes",
+    "command": "show fabricpath route",
+    "description": "Displays FabricPath unicast route table.",
+    "use_case": "Use when troubleshooting FabricPath reachability.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "route"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7075,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Enable FabricPath feature-set",
+    "command": "feature-set fabricpath",
+    "description": "Enables FabricPath feature-set after installation as shown in the workbook.",
+    "use_case": "Use only when intentionally enabling FabricPath.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "feature-set"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7076,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Set FabricPath interface mode",
+    "command": "switchport mode fabricpath",
+    "description": "Places an interface in FabricPath mode.",
+    "use_case": "Use only on intended supported interfaces.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "switchport"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7077,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "FabricPath",
+    "title": "Set FabricPath switch ID",
+    "command": "fabricpath switch-id <id>",
+    "description": "Configures a static FabricPath switch ID.",
+    "use_case": "Use carefully because switch IDs must be unique.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "switch-id"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7078,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "VLAN",
+    "title": "Show VLAN mode",
+    "command": "show vlan id <vlan-id> | section Vlan-mode|enet",
+    "description": "Shows VLAN mode information used to verify FabricPath VLAN mode.",
+    "use_case": "Use to verify VLAN mode.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "fabricpath",
+      "vlan"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7080,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Spanning Tree",
+    "title": "Show spanning tree VLAN",
+    "command": "show spanning-tree vlan <vlan-id>",
+    "description": "Displays spanning-tree state for a VLAN.",
+    "use_case": "Use to verify STP state where applicable.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "stp",
+      "spanning-tree",
+      "vlan"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7081,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "MAC Table",
+    "title": "Show dynamic MACs in VLAN",
+    "command": "show mac address-table dynamic vlan <vlan-id>",
+    "description": "Displays dynamic MAC entries learned in a VLAN.",
+    "use_case": "Use to trace hosts and verify MAC learning.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "mac",
+      "mac address-table",
+      "vlan"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7090,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "SPAN",
+    "title": "Show monitor session",
+    "command": "show monitor session <session-id>",
+    "description": "Displays a monitor session and its source/destination state.",
+    "use_case": "Use to verify SPAN configuration.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "span",
+      "monitor session"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7091,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "SPAN",
+    "title": "Show all monitor sessions",
+    "command": "show monitor session",
+    "description": "Displays configured monitor sessions.",
+    "use_case": "Use to inspect SPAN/ERSPAN/RSPAN sessions.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "span",
+      "erspan",
+      "rspan"
+    ],
+    "risk": "safe",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 7100,
+    "vendor": "Cisco",
+    "platform": "Nexus NX-OS",
+    "category": "Checkpoint",
+    "title": "Create checkpoint",
+    "command": "checkpoint <checkpoint-name>",
+    "description": "Creates a temporary configuration checkpoint as described in the workbook.",
+    "use_case": "Use before planned configuration changes.",
+    "tags": [
+      "nexus",
+      "nx-os",
+      "checkpoint",
+      "rollback"
+    ],
+    "risk": "caution",
+    "notes": "Workbook-derived"
+  },
+  {
+    "id": 8001,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Virtual Server",
+    "title": "Show all virtual servers",
+    "command": "tmsh show ltm virtual",
+    "description": "Displays status and statistics for LTM virtual servers.",
+    "use_case": "Use as a first check when a VIP/application is unavailable or not receiving traffic.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "vip",
+      "virtual server",
+      "status"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8002,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Virtual Server",
+    "title": "Show virtual server details",
+    "command": "tmsh show ltm virtual <virtual-server-name>",
+    "description": "Displays operational status/statistics for one virtual server.",
+    "use_case": "Use when troubleshooting a specific VIP.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "vip",
+      "virtual server",
+      "details"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8003,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Virtual Server",
+    "title": "List virtual server configuration",
+    "command": "tmsh list ltm virtual <virtual-server-name> all-properties",
+    "description": "Displays full virtual-server configuration.",
+    "use_case": "Use to inspect destination, pool, profiles, SNAT, persistence, iRules and policies.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "virtual server",
+      "configuration"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8004,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Pool",
+    "title": "Show all pools",
+    "command": "tmsh show ltm pool",
+    "description": "Displays pool status and statistics.",
+    "use_case": "Use to verify backend pool health after confirming the VIP.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "pool",
+      "backend"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8005,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Pool",
+    "title": "Show pool members",
+    "command": "tmsh show ltm pool <pool-name> members",
+    "description": "Displays pool-member status and statistics.",
+    "use_case": "Use when the VIP is up but backend traffic fails or is intermittent.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "pool",
+      "member",
+      "backend",
+      "health"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8006,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Pool",
+    "title": "List pool configuration",
+    "command": "tmsh list ltm pool <pool-name> all-properties",
+    "description": "Displays pool configuration including members, monitor and load-balancing method.",
+    "use_case": "Use when validating pool design/configuration.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "pool",
+      "monitor",
+      "load balancing"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8007,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Node",
+    "title": "Show nodes",
+    "command": "tmsh show ltm node",
+    "description": "Displays node state and statistics.",
+    "use_case": "Use when determining whether backend nodes are available independently of pool membership.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm",
+      "node",
+      "backend",
+      "server"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8010,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Interface",
+    "title": "Show interfaces",
+    "command": "tmsh show net interface",
+    "description": "Displays interface status and traffic/media information.",
+    "use_case": "Use for basic BIG-IP physical/TMM interface troubleshooting.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "interface",
+      "network",
+      "link",
+      "errors"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8011,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Trunk",
+    "title": "Show trunks",
+    "command": "tmsh show net trunk",
+    "description": "Displays BIG-IP trunk state.",
+    "use_case": "Use when troubleshooting link aggregation/LACP or aggregated connectivity.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "trunk",
+      "lacp",
+      "link aggregation"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8012,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "VLAN",
+    "title": "List VLANs",
+    "command": "tmsh list net vlan",
+    "description": "Displays VLAN configuration.",
+    "use_case": "Use to verify interface/trunk membership and VLAN configuration.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "vlan",
+      "network"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8013,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Self IP",
+    "title": "List Self IPs",
+    "command": "tmsh list net self",
+    "description": "Displays Self IP configuration.",
+    "use_case": "Use to verify BIG-IP addresses, VLAN bindings and related network configuration.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "self ip",
+      "network",
+      "vlan"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8014,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Routing",
+    "title": "Show routes",
+    "command": "tmsh show net route",
+    "description": "Displays BIG-IP routing information.",
+    "use_case": "Use to verify reachability toward clients, gateways and pool members.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "route",
+      "routing",
+      "gateway"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8015,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "ARP",
+    "title": "Show ARP table",
+    "command": "tmsh show net arp",
+    "description": "Displays ARP entries.",
+    "use_case": "Use when BIG-IP cannot reach a directly connected gateway or pool member.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "arp",
+      "mac",
+      "neighbor",
+      "network"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8020,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Connections",
+    "title": "Show connection table",
+    "command": "tmsh show sys connection",
+    "description": "Displays TMM connection-table entries.",
+    "use_case": "Use to determine whether BIG-IP is creating traffic flows.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "connection",
+      "session",
+      "tmm",
+      "flow"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8021,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Connections",
+    "title": "Filter connections by client",
+    "command": "tmsh show sys connection cs-client-addr <client-IP>",
+    "description": "Filters connection-table entries by client-side address.",
+    "use_case": "Use when tracing one client through BIG-IP.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "connection",
+      "client",
+      "session",
+      "flow"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8022,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Connections",
+    "title": "Filter connections by VIP",
+    "command": "tmsh show sys connection cs-server-addr <vip-address>",
+    "description": "Filters connection-table entries by client-side server/VIP address.",
+    "use_case": "Use when tracing connections associated with a specific virtual server address.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "connection",
+      "vip",
+      "session",
+      "flow"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8023,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Persistence",
+    "title": "Show persistence records",
+    "command": "tmsh show ltm persistence persist-records",
+    "description": "Displays persistence records.",
+    "use_case": "Use when troubleshooting persistence/stickiness behavior.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "persistence",
+      "stickiness",
+      "persist-records"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8030,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Packet Capture",
+    "title": "Basic host capture",
+    "command": "tcpdump -nni 0.0 -s0 host <IP>",
+    "description": "Captures full packets for a host across BIG-IP TMM interfaces.",
+    "use_case": "Use after basic VIP/pool/routing checks require packet-level verification.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tcpdump",
+      "packet capture",
+      "host",
+      "pcap"
+    ],
+    "risk": "caution",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8031,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Packet Capture",
+    "title": "Capture host and port",
+    "command": "tcpdump -nni 0.0 -s0 'host <IP> and port <PORT>'",
+    "description": "Captures traffic for a host and service port.",
+    "use_case": "Use to narrow capture scope to an application flow.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tcpdump",
+      "packet capture",
+      "port"
+    ],
+    "risk": "caution",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8032,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Packet Capture",
+    "title": "Save capture to PCAP",
+    "command": "tcpdump -nni 0.0 -s0 -w /var/tmp/app_issue.pcap 'host <IP> and port <PORT>'",
+    "description": "Writes a filtered full-packet capture to /var/tmp.",
+    "use_case": "Use when the capture must be analyzed in Wireshark.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tcpdump",
+      "pcap",
+      "wireshark"
+    ],
+    "risk": "caution",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8033,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Packet Capture",
+    "title": "Read saved PCAP",
+    "command": "tcpdump -nnr /var/tmp/app_issue.pcap",
+    "description": "Reads a saved packet capture on BIG-IP.",
+    "use_case": "Use for quick on-box review of a previously saved capture.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tcpdump",
+      "pcap",
+      "read"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8034,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Packet Capture",
+    "title": "Enhanced F5 flow correlation",
+    "command": "tcpdump -nni 0.0:nnnp -s0 -w /var/tmp/f5_flow.pcap 'host <IP>'",
+    "description": "Captures BIG-IP traffic with F5-specific flow/peer correlation metadata.",
+    "use_case": "Use when correlating client-side and server-side traffic through the full proxy.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tcpdump",
+      "nnnp",
+      "flow correlation",
+      "peer",
+      "pcap"
+    ],
+    "risk": "caution",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8035,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Packet Capture",
+    "title": "Capture SYN and RST",
+    "command": "tcpdump -nni 0.0 -s0 'host <IP> and tcp[tcpflags] & (tcp-syn|tcp-rst) != 0'",
+    "description": "Captures TCP SYN/RST packets for a host.",
+    "use_case": "Use when diagnosing handshake failures, resets or repeated connection attempts.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tcpdump",
+      "syn",
+      "rst",
+      "tcp"
+    ],
+    "risk": "caution",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8040,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "TLS",
+    "title": "Enable tcpdump SSL provider",
+    "command": "tmsh modify sys db tcpdump.sslprovider value enable",
+    "description": "Enables the BIG-IP tcpdump SSL provider used by supported versions for TLS-secret capture workflows.",
+    "use_case": "Use only for authorized TLS troubleshooting on supported BIG-IP releases.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tls",
+      "ssl",
+      "tcpdump",
+      "session secret"
+    ],
+    "risk": "sensitive",
+    "min_version": "15.x",
+    "notes": "F5 documentation describes --f5 ssl beginning with BIG-IP 15.x."
+  },
+  {
+    "id": 8041,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "TLS",
+    "title": "Capture TLS with F5 SSL metadata",
+    "command": "tcpdump -nni 0.0:nnn -s0 -w /var/tmp/tls_issue.pcap 'host <client-IP> and port 443' --f5 ssl",
+    "description": "Captures TLS traffic with F5 SSL information on supported BIG-IP releases.",
+    "use_case": "Use when authorized decryption/analysis in Wireshark is required.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "tls",
+      "ssl",
+      "tcpdump",
+      "--f5 ssl",
+      "session secret"
+    ],
+    "risk": "sensitive",
+    "min_version": "15.x",
+    "notes": "Treat resulting capture as sensitive because it may enable TLS decryption."
+  },
+  {
+    "id": 8050,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "iRule",
+    "title": "Show iRules attached to virtual server",
+    "command": "tmsh list ltm virtual <virtual-server-name> rules",
+    "description": "Lists iRules associated with a virtual server.",
+    "use_case": "Use when application behavior may be affected by iRules.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "irule",
+      "virtual server",
+      "rules"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8051,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "iRule",
+    "title": "Display iRule",
+    "command": "tmsh list ltm rule <irule-name>",
+    "description": "Displays an iRule definition.",
+    "use_case": "Use to review iRule logic during troubleshooting.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "irule",
+      "rule",
+      "ltm"
+    ],
+    "risk": "safe",
+    "min_version": null,
+    "notes": null
+  },
+  {
+    "id": 8052,
+    "vendor": "F5",
+    "platform": "BIG-IP",
+    "category": "Logging",
+    "title": "Tail LTM log",
+    "command": "tail -f /var/log/ltm",
+    "description": "Streams LTM log output.",
+    "use_case": "Use during controlled troubleshooting of iRules/LTM events; stop when finished.",
+    "tags": [
+      "f5",
+      "big-ip",
+      "ltm log",
+      "log",
+      "tail",
+      "irule"
+    ],
+    "risk": "caution",
+    "min_version": null,
+    "notes": null
   }
 ]

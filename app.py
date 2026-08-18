@@ -50,12 +50,17 @@ def score(c, q):
 def home():
     q = request.args.get("q", "").strip()
     vendor = request.args.get("vendor", "").strip()
+    platform = request.args.get("platform", "").strip()
 
     results = []
 
     if q:
         for c in COMMANDS:
+
             if vendor and c["vendor"] != vendor:
+                continue
+
+            if platform and c["platform"] != platform:
                 continue
 
             sc = score(c, q)
@@ -64,20 +69,25 @@ def home():
                 results.append((sc, c))
 
         results = [
-            c
-            for _, c in sorted(
+            c for _, c in sorted(
                 results,
                 key=lambda x: x[0],
                 reverse=True
             )
         ]
 
+    vendors = sorted(set(c["vendor"] for c in COMMANDS))
+    platform = request.args.get("platform", "").strip()
+    platforms = sorted(set(c["platform"] for c in COMMANDS))
+
     return render_template(
         "index.html",
         q=q,
         vendor=vendor,
+        platform=platform,
         results=results,
-        vendors=sorted(set(c["vendor"] for c in COMMANDS)),
+        vendors=vendors,
+        platforms=platforms
     )
 
 

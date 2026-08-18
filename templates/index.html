@@ -57,17 +57,25 @@ Find network commands by what you want to do
 </h1>
 
 <p>
-Search Cisco, FortiGate and Palo Alto using troubleshooting language.
+Search Cisco IOS, Cisco Nexus NX-OS, FortiGate, Palo Alto and F5
+using troubleshooting language.
 </p>
 
+
+<!-- ====================================================== -->
+<!-- SEARCH FORM -->
+<!-- ====================================================== -->
 
 <form>
 
 <input
     name="q"
-    value="{{q}}"
-    placeholder="Try: bgp neighbor, routing table, arp, ipsec tunnel"
+    value="{{ q }}"
+    placeholder="Try: bgp neighbor, vpc, fex, routing table, arp, ipsec tunnel"
 >
+
+
+<!-- VENDOR FILTER -->
 
 <select name="vendor">
 
@@ -78,16 +86,42 @@ All vendors
 {% for v in vendors %}
 
 <option
-    {% if vendor==v %}
+    value="{{ v }}"
+    {% if vendor == v %}
     selected
     {% endif %}
 >
-{{v}}
+{{ v }}
 </option>
 
 {% endfor %}
 
 </select>
+
+
+<!-- PLATFORM FILTER -->
+
+<select name="platform">
+
+<option value="">
+All platforms
+</option>
+
+{% for p in platforms %}
+
+<option
+    value="{{ p }}"
+    {% if platform == p %}
+    selected
+    {% endif %}
+>
+{{ p }}
+</option>
+
+{% endfor %}
+
+</select>
+
 
 <button>
 Search
@@ -96,10 +130,18 @@ Search
 </form>
 
 
+<!-- ====================================================== -->
+<!-- QUICK SEARCH -->
+<!-- ====================================================== -->
+
 <div class="quick">
 
 <a href="/?q=bgp+neighbor">
 BGP
+</a>
+
+<a href="/?q=ospf">
+OSPF
 </a>
 
 <a href="/?q=routing+table">
@@ -114,6 +156,30 @@ ARP
 IPsec
 </a>
 
+<a href="/?q=vpc&vendor=Cisco&platform=Nexus+NX-OS">
+Nexus vPC
+</a>
+
+<a href="/?q=fex&vendor=Cisco&platform=Nexus+NX-OS">
+Nexus FEX
+</a>
+
+<a href="/?q=fabricpath&vendor=Cisco&platform=Nexus+NX-OS">
+FabricPath
+</a>
+
+<a href="/?q=license&vendor=Cisco&platform=Nexus+NX-OS">
+Nexus License
+</a>
+
+<a href="/?q=span&vendor=Cisco&platform=Nexus+NX-OS">
+SPAN
+</a>
+
+<a href="/?q=tcpdump">
+tcpdump
+</a>
+
 <a href="/compare?q=bgp">
 Compare BGP
 </a>
@@ -125,67 +191,159 @@ Find End Device
 </div>
 
 
+<!-- ====================================================== -->
+<!-- NO RESULTS -->
+<!-- ====================================================== -->
+
 {% if q and not results %}
 
 <div class="card">
 
-No matches.
+<h2>
+No matches found
+</h2>
 
-Try a simpler phrase.
+<p>
+Try a simpler search phrase or select a different vendor/platform.
+</p>
+
+<p>
+Examples:
+</p>
+
+<pre>vpc
+fex
+bgp
+ospf
+arp
+routing table
+ipsec
+tcpdump
+pool member</pre>
 
 </div>
 
 {% endif %}
 
 
+<!-- ====================================================== -->
+<!-- SEARCH RESULTS -->
+<!-- ====================================================== -->
+
 {% for c in results %}
 
 <div class="card">
 
+
+<!-- Vendor / Platform / Risk -->
+
 <div>
 
 <b>
-{{c.vendor}}
+{{ c.vendor }}
 </b>
 
 ·
 
-{{c.platform}}
+{{ c.platform }}
 
-<span class="risk {{c.risk}}">
-{{c.risk}}
+{% if c.risk %}
+
+<span class="risk {{ c.risk }}">
+{{ c.risk }}
 </span>
+
+{% endif %}
 
 </div>
 
 
+<!-- Category -->
+
 <small>
-{{c.category}}
+{{ c.category }}
 </small>
 
 
+<!-- Command title -->
+
 <h2>
-{{c.title}}
+{{ c.title }}
 </h2>
 
 
-<pre>{{c.command}}</pre>
+<!-- Command -->
 
+<pre>{{ c.command }}</pre>
+
+
+<!-- Description -->
 
 <p>
-{{c.description}}
+{{ c.description }}
 </p>
 
 
-<a href="/command/{{c.id}}">
+<!-- Use case -->
+
+{% if c.use_case %}
+
+<p>
+
+<b>
+When to use:
+</b>
+
+{{ c.use_case }}
+
+</p>
+
+{% endif %}
+
+
+<!-- Details -->
+
+<a href="/command/{{ c.id }}">
 Open details →
 </a>
+
+
+<!-- Nexus Troubleshooting Link -->
+
+{% if c.platform == "Nexus NX-OS" %}
+
+&nbsp; | &nbsp;
+
+<a href="/troubleshoot/nexus">
+Nexus Troubleshooting →
+</a>
+
+{% endif %}
+
+
+<!-- F5 Troubleshooting Link -->
+
+{% if c.vendor == "F5" %}
+
+&nbsp; | &nbsp;
+
+<a href="/troubleshoot/f5">
+F5 Troubleshooting →
+</a>
+
+{% endif %}
+
 
 </div>
 
 {% endfor %}
 
+
 </main>
+
+
+<script src="/static/app.js"></script>
+
 
 </body>
 

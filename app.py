@@ -163,6 +163,9 @@ def troubleshoot():
 @app.route("/troubleshoot/f5")
 def f5_troubleshoot():
     return render_template("f5_troubleshoot.html")
+@app.route("/troubleshoot/nexus")
+def nexus_troubleshoot():
+    return render_template("nexus_troubleshoot.html")
 @app.route("/health")
 def health():
     return {

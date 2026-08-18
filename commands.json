@@ -2036,5 +2036,83 @@
     "risk": "caution",
     "min_version": null,
     "notes": null
-  }
+  },
+  {
+  "id": 7110,
+  "vendor": "Cisco",
+  "platform": "Nexus NX-OS",
+  "category": "Performance",
+  "title": "Show system CPU and memory resources",
+  "command": "show system resources",
+  "description": "Displays system CPU, load, process counts and memory information.",
+  "use_case": "Use as the first baseline command for high CPU or high memory symptoms.",
+  "tags": ["nexus", "nx-os", "cpu", "memory", "performance", "system resources", "load"],
+  "risk": "safe",
+  "notes": "Cisco troubleshooting documentation; verify output fields for the exact NX-OS release."
+},
+{
+  "id": 7111,
+  "vendor": "Cisco",
+  "platform": "Nexus NX-OS",
+  "category": "Performance",
+  "title": "Show process CPU utilization",
+  "command": "show processes cpu",
+  "description": "Displays CPU utilization by process.",
+  "use_case": "Use after confirming elevated CPU to identify which process is consuming CPU.",
+  "tags": ["nexus", "nx-os", "cpu", "process", "high cpu", "performance"],
+  "risk": "safe",
+  "notes": "Cisco troubleshooting documentation."
+},
+{
+  "id": 7112,
+  "vendor": "Cisco",
+  "platform": "Nexus NX-OS",
+  "category": "Performance",
+  "title": "Show CPU history",
+  "command": "show processes cpu history",
+  "description": "Displays historical CPU utilization and helps distinguish spikes from sustained load.",
+  "use_case": "Use when determining whether CPU utilization is persistent or transient.",
+  "tags": ["nexus", "nx-os", "cpu", "history", "spike", "sustained", "performance"],
+  "risk": "safe",
+  "notes": "Cisco troubleshooting documentation."
+},
+{
+  "id": 7113,
+  "vendor": "Cisco",
+  "platform": "Nexus NX-OS",
+  "category": "Performance",
+  "title": "Sort processes by CPU",
+  "command": "show processes cpu sort",
+  "description": "Displays process CPU data ordered to make high consumers easier to identify on supported releases.",
+  "use_case": "Use when finding the process responsible for sustained CPU utilization.",
+  "tags": ["nexus", "nx-os", "cpu", "process", "sort", "high cpu"],
+  "risk": "safe",
+  "notes": "Confirm exact availability/syntax on the NX-OS release in use."
+},
+{
+  "id": 7114,
+  "vendor": "Cisco",
+  "platform": "Nexus NX-OS",
+  "category": "Memory",
+  "title": "Show process memory utilization",
+  "command": "show processes memory",
+  "description": "Displays process memory allocation/usage information.",
+  "use_case": "Use with show system resources when investigating high memory utilization.",
+  "tags": ["nexus", "nx-os", "memory", "process memory", "high memory", "performance"],
+  "risk": "safe",
+  "notes": "Cisco Nexus 9000 troubleshooting documentation."
+},
+{
+  "id": 7115,
+  "vendor": "Cisco",
+  "platform": "Nexus NX-OS",
+  "category": "Logging",
+  "title": "Show Nexus logging file",
+  "command": "show logging logfile",
+  "description": "Displays operational log messages from the Nexus logging file on supported releases.",
+  "use_case": "Use to correlate CPU, memory, interface, vPC or process symptoms with recent events.",
+  "tags": ["nexus", "nx-os", "logging", "log", "events", "cpu", "memory"],
+  "risk": "safe",
+  "notes": "Confirm command availability/output for the exact NX-OS release."
+}
 ]

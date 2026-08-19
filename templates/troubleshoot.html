@@ -1,93 +1,237 @@
 <!doctype html>
-<html>
+
+<html lang="en">
+
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Troubleshooting - Network Command Assistant</title>
-<link rel="stylesheet" href="/static/style.css">
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>
+Troubleshooting Center - Network Command Assistant
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/style.css"
+>
+
 </head>
+
 
 <body>
 
-<nav>
-<b>Network Command Assistant</b>
-<span>
-<a href="/">Search</a>
-<a href="/compare">Compare</a>
-<a href="/device-finder">End Device Finder</a>
-<a href="/troubleshoot">Troubleshoot</a>
-</span>
-</nav>
+
+{% include "partials/navbar.html" %}
+
 
 <main>
 
-<h1>Troubleshooting Center</h1>
+
+<!-- =====================================================
+     PAGE HEADER
+===================================================== -->
+
+<section class="hero">
+
+<div class="hero-kicker">
+NETWORK TROUBLESHOOTING WORKBENCH
+</div>
+
+
+<h1>
+Troubleshooting Center
+</h1>
+
 
 <p>
-Choose the problem you are investigating and follow a structured troubleshooting path.
+Choose the problem you are investigating and follow a structured,
+evidence-based troubleshooting path.
 </p>
+
+
+<div class="status-line">
+
+<span class="status-chip">
+<strong>●</strong>
+SAFE-FIRST
+</span>
+
+<span class="status-chip">
+GUIDED WORKFLOWS
+</span>
+
+<span class="status-chip">
+NETWORK AI
+</span>
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     FORTIGATE VPN AI
+===================================================== -->
 
 <div class="card">
-<h2>🔐 Site-to-Site VPN</h2>
+
+<h2>
+🤖 FortiGate VPN AI
+</h2>
+
 
 <p>
-Troubleshoot IPsec VPNs on FortiGate and Palo Alto.
+Interactive FortiGate IPsec VPN troubleshooting using a state-driven
+decision engine.
 </p>
 
+
 <p>
-Phase 1 → Phase 2 → Routing → Policy/NAT → Sessions → Packet Flow
+Symptom → VPN State → Counters → Routing → Policy → NAT →
+Session → Flow Debug → Packet Capture
 </p>
+
+
+<p>
+
+<strong>
+Current AI coverage:
+</strong>
+
+Tunnel Down and Tunnel Up / No Traffic.
+
+</p>
+
+
+<a href="{{ url_for('fortigate_vpn_ai') }}">
+Open FortiGate VPN AI →
+</a>
+
+</div>
+
+
+
+<!-- =====================================================
+     SITE-TO-SITE VPN
+===================================================== -->
+
+<div class="card">
+
+<h2>
+🔐 Site-to-Site VPN
+</h2>
+
+
+<p>
+Traditional guided IPsec VPN troubleshooting for FortiGate
+and Palo Alto.
+</p>
+
+
+<p>
+Phase 1 → Phase 2 → Routing → Policy/NAT →
+Sessions → Packet Flow
+</p>
+
 
 <a href="/troubleshoot/vpn">
 Open VPN Troubleshooter →
 </a>
+
 </div>
 
 
+
+<!-- =====================================================
+     ROUTING
+===================================================== -->
+
 <div class="card">
-<h2>🌐 BGP & OSPF</h2>
+
+<h2>
+🌐 BGP & OSPF
+</h2>
+
 
 <p>
-Troubleshoot routing adjacency, route learning, advertisements and forwarding.
+Troubleshoot routing adjacency, route learning,
+advertisements, path selection and forwarding.
 </p>
 
+
 <p>
-Neighbor → Database → Best Path → Routing Table → Forwarding
+Neighbor → Database → Advertisement →
+Best Path → Routing Table → Forwarding
 </p>
+
 
 <a href="/troubleshoot/routing">
 Open Routing Troubleshooter →
 </a>
+
 </div>
 
 
+
+<!-- =====================================================
+     END DEVICE FINDER
+===================================================== -->
+
 <div class="card">
-<h2>🖥️ End Device Finder</h2>
+
+<h2>
+🖥️ End Device Finder
+</h2>
+
 
 <p>
-Trace an endpoint from its IP address to its physical switch port.
+Trace an endpoint from its IP address to its physical
+switch port.
 </p>
+
 
 <p>
 IP → ARP → MAC → Switch Port → Downstream Switch
 </p>
 
+
 <a href="/device-finder">
 Open End Device Finder →
 </a>
+
 </div>
+
+
+
+<!-- =====================================================
+     F5
+===================================================== -->
 
 <div class="card">
 
-<h2>F5 BIG-IP LTM</h2>
+<h2>
+F5 BIG-IP LTM
+</h2>
+
 
 <p>
-Troubleshoot BIG-IP networking, virtual servers, pools, connections,
-tcpdump captures, and iRules.
+Troubleshoot BIG-IP networking, virtual servers,
+pools, members, connections, tcpdump captures,
+TLS behavior and iRules.
 </p>
 
+
 <p>
-Network → VIP → Pool → Member → Connection → tcpdump → iRule
+Network → VIP → Pool → Member →
+Connection → tcpdump → TLS → iRule
 </p>
+
 
 <a href="/troubleshoot/f5">
 Open F5 BIG-IP Troubleshooter →
@@ -95,36 +239,97 @@ Open F5 BIG-IP Troubleshooter →
 
 </div>
 
+
+
+<!-- =====================================================
+     CISCO NEXUS
+===================================================== -->
+
 <div class="card">
-<h2>Cisco Nexus NX-OS</h2>
+
+<h2>
+Cisco Nexus NX-OS
+</h2>
+
+
 <p>
-Guided troubleshooting for Nexus basic health, interfaces, vPC, FEX,
-FabricPath, SPAN/ERSPAN, high CPU and high memory.
+Guided troubleshooting for Nexus basic health,
+interfaces, port-channels, vPC, FEX, FabricPath,
+SPAN/ERSPAN, high CPU and high memory.
 </p>
+
+
 <p>
-Baseline → Layer 2/3 → vPC/FEX → Performance → Evidence
+Baseline → Layer 2/3 → vPC/FEX →
+Performance → Evidence
 </p>
+
+
 <a href="/troubleshoot/nexus">
 Open Nexus Troubleshooting →
 </a>
+
 </div>
 
+
+
+<!-- =====================================================
+     FUTURE MODULES
+===================================================== -->
+
 <div class="card">
-<h2>Coming next</h2>
+
+<h2>
+Coming Next
+</h2>
+
+
 <p>
-Future troubleshooting modules can include:
+Future troubleshooting and AI modules can include:
 </p>
 
+
 <ul>
-<li>High CPU / performance</li>
-<li>Interface errors and packet drops</li>
-<li>Firewall traffic troubleshooting</li>
-<li>NAT troubleshooting</li>
-<li>DNS / DHCP troubleshooting</li>
+
+<li>
+FortiGate VPN CLI-output parser
+</li>
+
+<li>
+Palo Alto VPN AI
+</li>
+
+<li>
+Firewall traffic-flow AI
+</li>
+
+<li>
+NAT troubleshooting AI
+</li>
+
+<li>
+Interface errors and packet drops
+</li>
+
+<li>
+Cross-vendor performance troubleshooting
+</li>
+
+<li>
+DNS / DHCP troubleshooting
+</li>
+
 </ul>
 
 </div>
 
+
 </main>
+
+
+<script src="/static/app.js"></script>
+
+
 </body>
+
 </html>

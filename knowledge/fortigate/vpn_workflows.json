@@ -1,0 +1,278 @@
+{
+  "workflow": {
+    "id": "fortigate_ipsec_vpn",
+    "name": "FortiGate IPsec VPN Troubleshooting",
+    "vendor": "FortiGate",
+    "platform": "FortiOS",
+    "version_family": "7.4",
+    "description": "Guided troubleshooting workflow for route-based FortiGate IPsec VPN problems."
+  },
+
+  "entry_points": {
+    "tunnel_down": {
+      "title": "VPN Tunnel Down",
+      "description": "Use when the IPsec VPN is not established.",
+      "first_step": "check_vpn_status"
+    },
+
+    "tunnel_up_no_traffic": {
+      "title": "VPN Up But No Traffic",
+      "description": "Use when the IPsec tunnel is established but application traffic is not passing.",
+      "first_step": "check_ipsec_counters"
+    }
+  },
+
+  "steps": {
+    "check_vpn_status": {
+      "title": "Check VPN Status",
+      "risk": "safe",
+      "purpose": "Determine whether IKE Phase 1 and IPsec Phase 2 are established.",
+
+      "commands": [
+        "diagnose vpn ike status",
+        "diagnose vpn ike gateway list",
+        "get vpn ipsec tunnel summary",
+        "diagnose vpn tunnel list"
+      ],
+
+      "decision": {
+        "ike_down": "check_underlay",
+        "ike_up_phase2_down": "check_phase2",
+        "tunnel_up": "check_ipsec_counters"
+      }
+    },
+
+    "check_underlay": {
+      "title": "Check Internet / Underlay Reachability",
+      "risk": "safe",
+      "purpose": "Verify that the FortiGate can reach the remote VPN peer before debugging IKE.",
+
+      "commands": [
+        "get router info routing-table details <REMOTE-PEER-IP>",
+        "execute ping <REMOTE-PEER-IP>",
+        "diagnose sniffer packet any 'host <REMOTE-PEER-IP> and (port 500 or port 4500)' 4 0 l"
+      ],
+
+      "decision": {
+        "peer_reachable": "debug_ike",
+        "peer_unreachable": "underlay_failure"
+      }
+    },
+
+    "debug_ike": {
+      "title": "Debug IKE Phase 1",
+      "risk": "debug",
+      "purpose": "Collect IKE negotiation evidence after basic underlay checks are complete.",
+
+      "warning": "Debug commands should be filtered and used for a limited troubleshooting window. Verify the IKE log-filter syntax on the exact FortiOS 7.4 maintenance release before production use.",
+
+      "commands": [
+        "diagnose debug reset",
+        "diagnose vpn ike log-filter clear",
+        "diagnose vpn ike log-filter name <VPN-NAME>",
+        "diagnose debug console timestamp enable",
+        "diagnose debug application ike -1",
+        "diagnose debug enable"
+      ],
+
+      "cleanup_commands": [
+        "diagnose debug disable",
+        "diagnose debug application ike 0",
+        "diagnose vpn ike log-filter clear",
+        "diagnose debug reset"
+      ],
+
+      "decision": {
+        "phase1_established": "check_phase2",
+        "phase1_failed": "analyze_phase1_failure"
+      }
+    },
+
+    "check_phase2": {
+      "title": "Check Phase 2 / IPsec SA",
+      "risk": "safe",
+      "purpose": "Verify IPsec security associations, selectors, and tunnel state.",
+
+      "commands": [
+        "get vpn ipsec tunnel summary",
+        "diagnose vpn tunnel list"
+      ],
+
+      "decision": {
+        "phase2_up": "check_ipsec_counters",
+        "phase2_down": "analyze_phase2_failure"
+      }
+    },
+
+    "check_ipsec_counters": {
+      "title": "Check VPN Packet Counters",
+      "risk": "safe",
+      "purpose": "Determine whether traffic is entering and returning through the IPsec tunnel.",
+
+      "commands": [
+        "get vpn ipsec tunnel summary",
+        "diagnose vpn tunnel list"
+      ],
+
+      "decision": {
+        "tx_rx_incrementing": "traffic_working",
+        "tx_incrementing_rx_zero": "check_remote_return_path",
+        "no_counter_change": "check_route"
+      }
+    },
+
+    "check_route": {
+      "title": "Check Routing",
+      "risk": "safe",
+      "purpose": "Verify that the destination resolves toward the intended VPN path.",
+
+      "commands": [
+        "get router info routing-table details <DESTINATION-IP>"
+      ],
+
+      "decision": {
+        "route_correct": "check_policy",
+        "route_wrong": "routing_failure",
+        "route_missing": "routing_failure"
+      }
+    },
+
+    "routing_failure": {
+      "title": "Routing Failure Identified",
+      "risk": "safe",
+      "purpose": "The VPN is established, but FortiGate does not have the expected usable route toward the remote destination.",
+
+      "likely_causes": [
+        "Missing route to the remote destination",
+        "Wrong destination prefix",
+        "Route pointing to the wrong interface",
+        "Competing route with better distance or priority",
+        "Dynamic routing has not installed the expected route",
+        "VPN interface is not being selected for the destination"
+      ],
+
+      "commands": [
+        "get router info routing-table details <DESTINATION-IP>",
+        "get router info routing-table all",
+        "get router info routing-table database"
+      ],
+
+      "recommended_checks": [
+        "Verify the destination prefix",
+        "Verify the expected VPN interface",
+        "Check route distance and priority",
+        "Check for a more preferred competing route",
+        "If dynamic routing is used, verify neighbor state and route advertisement",
+        "Confirm the route exists in the active routing table, not only in configuration"
+      ],
+
+      "decision": {
+        "route_fixed": "check_policy",
+        "still_no_route": "routing_escalation"
+      }
+    },
+
+    "check_policy": {
+      "title": "Check Firewall Policy",
+      "risk": "safe",
+      "purpose": "Verify that the VPN traffic matches the intended firewall policy.",
+
+      "commands": [
+        "show firewall policy"
+      ],
+
+      "decision": {
+        "policy_correct": "check_nat",
+        "policy_missing": "policy_failure",
+        "policy_wrong": "policy_failure"
+      }
+    },
+
+    "check_nat": {
+      "title": "Check NAT",
+      "risk": "safe",
+      "purpose": "Determine whether source NAT is expected and whether the correct translated source is being used.",
+
+      "commands": [
+        "show firewall policy"
+      ],
+
+      "decision": {
+        "nat_expected": "check_session",
+        "nat_not_expected": "check_session",
+        "unexpected_nat": "nat_failure"
+      }
+    },
+
+    "check_session": {
+      "title": "Check Session",
+      "risk": "safe",
+      "purpose": "Determine whether FortiGate created a session and which policy, NAT, and forwarding path are being used.",
+
+      "commands": [
+        "diagnose sys session filter clear",
+        "diagnose sys session filter src <SOURCE-IP>",
+        "diagnose sys session filter dst <DESTINATION-IP>",
+        "diagnose sys session list"
+      ],
+
+      "cleanup_commands": [
+        "diagnose sys session filter clear"
+      ],
+
+      "decision": {
+        "session_found": "flow_debug",
+        "session_not_found": "flow_debug"
+      }
+    },
+
+    "flow_debug": {
+      "title": "Run Filtered Flow Debug",
+      "risk": "debug",
+      "purpose": "Observe FortiGate packet processing and identify routing, policy, NAT, or session decisions.",
+
+      "warning": "Always use narrow source/destination filters and stop the debug after collecting sufficient evidence.",
+
+      "commands": [
+        "diagnose debug reset",
+        "diagnose debug flow filter clear",
+        "diagnose debug flow filter saddr <SOURCE-IP>",
+        "diagnose debug flow filter daddr <DESTINATION-IP>",
+        "diagnose debug console timestamp enable",
+        "diagnose debug flow show function-name enable",
+        "diagnose debug flow trace start 100",
+        "diagnose debug enable"
+      ],
+
+      "cleanup_commands": [
+        "diagnose debug disable",
+        "diagnose debug flow trace stop",
+        "diagnose debug flow filter clear",
+        "diagnose debug reset"
+      ],
+
+      "decision": {
+        "policy_denied": "policy_failure",
+        "route_failure": "routing_failure",
+        "nat_problem": "nat_failure",
+        "forwarded_to_vpn": "packet_capture"
+      }
+    },
+
+    "packet_capture": {
+      "title": "Capture VPN Traffic",
+      "risk": "diagnostic",
+      "purpose": "Verify where traffic enters and exits the FortiGate and whether return traffic is received.",
+
+      "commands": [
+        "diagnose sniffer packet any 'host <SOURCE-IP> and host <DESTINATION-IP>' 4 0 l"
+      ],
+
+      "decision": {
+        "bidirectional": "analyze_application_path",
+        "outbound_only": "check_remote_return_path",
+        "no_packets": "check_source_path"
+      }
+    }
+  }
+}

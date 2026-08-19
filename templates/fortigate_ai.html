@@ -1,0 +1,519 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>
+FortiGate VPN Troubleshooting AI
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/style.css"
+>
+
+</head>
+
+
+<body>
+
+
+{% include "partials/navbar.html" %}
+
+
+<main>
+
+
+<!-- =====================================================
+     PAGE HEADER
+===================================================== -->
+
+<div class="section-label">
+NETWORK AI · FORTIGATE
+</div>
+
+
+<h1>
+FortiGate VPN Troubleshooting AI
+</h1>
+
+
+<p>
+Select the current VPN symptom. The troubleshooting engine will determine
+the next diagnostic step from the FortiGate VPN decision graph.
+</p>
+
+
+
+<!-- =====================================================
+     START WORKFLOW
+===================================================== -->
+
+<div class="card">
+
+
+<h2>
+What is the current VPN state?
+</h2>
+
+
+<form method="POST">
+
+
+<input
+    type="hidden"
+    name="action"
+    value="start"
+>
+
+
+<div class="quick">
+
+
+<button
+    type="submit"
+    name="symptom"
+    value="tunnel_down"
+>
+Tunnel Down
+</button>
+
+
+<button
+    type="submit"
+    name="symptom"
+    value="tunnel_up_no_traffic"
+>
+Tunnel Up / No Traffic
+</button>
+
+
+</div>
+
+
+</form>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     RESULT EXISTS
+===================================================== -->
+
+{% if result %}
+
+
+
+<!-- =====================================================
+     ERROR RESULT
+===================================================== -->
+
+{% if result.error %}
+
+
+<div class="card">
+
+
+<h2>
+Workflow Error
+</h2>
+
+
+<p>
+{{ result.error }}
+</p>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     NORMAL RESULT
+===================================================== -->
+
+{% else %}
+
+
+
+<!-- =====================================================
+     TERMINAL / NOT YET DEFINED RESULT
+===================================================== -->
+
+{% if result.status == "terminal_or_not_yet_defined" %}
+
+
+<div class="card">
+
+
+<h2>
+Workflow Endpoint
+</h2>
+
+
+<p>
+{{ result.message }}
+</p>
+
+
+<p>
+
+<strong>
+Step:
+</strong>
+
+{{ result.step_id }}
+
+</p>
+
+
+</div>
+
+
+
+{% else %}
+
+
+
+<!-- =====================================================
+     AI DECISION CARD
+===================================================== -->
+
+<div class="card">
+
+
+<div>
+
+
+<strong>
+NETWORK AI DECISION
+</strong>
+
+
+{% if result.risk %}
+
+<span class="risk {{ result.risk }}">
+{{ result.risk }}
+</span>
+
+{% endif %}
+
+
+</div>
+
+
+
+<h2>
+{{ result.title }}
+</h2>
+
+
+
+<p>
+{{ result.purpose }}
+</p>
+
+
+
+<p>
+
+<strong>
+Workflow Step:
+</strong>
+
+{{ result.step_id }}
+
+</p>
+
+
+
+<!-- =====================================================
+     LIKELY CAUSES
+===================================================== -->
+
+{% if result.likely_causes %}
+
+
+<h3>
+Likely Causes
+</h3>
+
+
+<ul>
+
+
+{% for cause in result.likely_causes %}
+
+
+<li>
+{{ cause }}
+</li>
+
+
+{% endfor %}
+
+
+</ul>
+
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     RECOMMENDED CHECKS
+===================================================== -->
+
+{% if result.recommended_checks %}
+
+
+<h3>
+Recommended Checks
+</h3>
+
+
+<ul>
+
+
+{% for check in result.recommended_checks %}
+
+
+<li>
+{{ check }}
+</li>
+
+
+{% endfor %}
+
+
+</ul>
+
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     WARNING
+===================================================== -->
+
+{% if result.warning %}
+
+
+<div class="warn">
+
+
+<strong>
+Warning
+</strong>
+
+
+<p>
+{{ result.warning }}
+</p>
+
+
+</div>
+
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     RECOMMENDED COMMANDS
+===================================================== -->
+
+{% if result.commands %}
+
+
+<h3>
+Recommended Commands
+</h3>
+
+
+{% for command in result.commands %}
+
+
+<div class="terminal-title">
+FortiOS CLI
+</div>
+
+
+<pre>{{ command }}</pre>
+
+
+{% endfor %}
+
+
+{% endif %}
+
+
+
+<!-- =====================================================
+     CLEANUP COMMANDS
+===================================================== -->
+
+{% if result.cleanup_commands %}
+
+
+<h3>
+Cleanup Commands
+</h3>
+
+
+<p>
+Run these commands after completing the diagnostic.
+</p>
+
+
+{% for command in result.cleanup_commands %}
+
+
+<div class="terminal-title">
+FortiOS Cleanup
+</div>
+
+
+<pre>{{ command }}</pre>
+
+
+{% endfor %}
+
+
+{% endif %}
+
+
+</div>
+
+
+
+<!-- =====================================================
+     DECISION BUTTONS
+===================================================== -->
+
+{% if result.decision %}
+
+
+<div class="card">
+
+
+<h2>
+What did you observe?
+</h2>
+
+
+<p>
+Select the result that best matches the FortiGate output.
+</p>
+
+
+
+{% for decision, next_step in result.decision.items() %}
+
+
+<form
+    method="POST"
+    style="margin-bottom: 12px;"
+>
+
+
+<input
+    type="hidden"
+    name="action"
+    value="decision"
+>
+
+
+<input
+    type="hidden"
+    name="current_step"
+    value="{{ result.step_id }}"
+>
+
+
+<input
+    type="hidden"
+    name="decision_result"
+    value="{{ decision }}"
+>
+
+
+<button
+    type="submit"
+    style="
+        width: 100%;
+        text-align: left;
+        padding: 14px;
+    "
+>
+
+
+<strong>
+
+{{ decision
+    | replace("_", " ")
+    | upper
+}}
+
+</strong>
+
+
+<br>
+
+
+<small>
+
+NEXT STEP:
+
+{{ next_step }}
+
+</small>
+
+
+</button>
+
+
+</form>
+
+
+{% endfor %}
+
+
+</div>
+
+
+{% endif %}
+
+
+
+{% endif %}
+
+
+{% endif %}
+
+
+{% endif %}
+
+
+
+</main>
+
+
+
+<script src="/static/app.js"></script>
+
+
+</body>
+
+</html>

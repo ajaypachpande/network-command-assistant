@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request, abort
 import json
 from pathlib import Path
+from ai.fortigate_vpn import (
+    start_vpn_troubleshooting,
+    get_next_step
+)
+
 
 app = Flask(__name__)
 
@@ -173,6 +178,73 @@ def health():
         "commands": len(COMMANDS),
         "version": "3-development"
     }
+
+# ==========================================================
+# FORTIGATE VPN AI
+# ==========================================================
+
+@app.route(
+    "/ai/fortigate-vpn",
+    methods=["GET", "POST"]
+)
+def fortigate_vpn_ai():
+
+    result = None
+
+    if request.method == "POST":
+
+        action = request.form.get(
+            "action"
+        )
+
+        symptom = request.form.get(
+            "symptom"
+        )
+
+
+        # --------------------------------------------------
+        # START A NEW WORKFLOW
+        # --------------------------------------------------
+
+        if (
+            action == "start"
+            or (symptom and not action)
+        ):
+
+            result = start_vpn_troubleshooting(
+                symptom
+            )
+
+
+        # --------------------------------------------------
+        # FOLLOW AN EXISTING DECISION
+        # --------------------------------------------------
+
+        elif action == "decision":
+
+            current_step = request.form.get(
+                "current_step"
+            )
+
+            decision_result = request.form.get(
+                "decision_result"
+            )
+
+            if (
+                current_step
+                and decision_result
+            ):
+
+                result = get_next_step(
+                    current_step,
+                    decision_result
+                )
+
+
+    return render_template(
+        "fortigate_ai.html",
+        result=result
+    )
 
 
 if __name__ == "__main__":

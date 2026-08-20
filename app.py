@@ -5,7 +5,10 @@ from ai.fortigate_vpn import (
     start_vpn_troubleshooting,
     get_next_step
 )
-
+from ai.aws_network import (
+    start_aws_troubleshooting,
+    get_next_step as get_next_aws_step
+)
 
 app = Flask(__name__)
 
@@ -246,6 +249,69 @@ def fortigate_vpn_ai():
         result=result
     )
 
+# ==========================================================
+# AWS NETWORK AI
+# ==========================================================
+
+@app.route(
+    "/ai/aws-network",
+    methods=["GET", "POST"]
+)
+def aws_network_ai():
+
+    result = None
+
+    if request.method == "POST":
+
+        action = request.form.get(
+            "action"
+        )
+
+        symptom = request.form.get(
+            "symptom"
+        )
+
+        # --------------------------------------------------
+        # START WORKFLOW
+        # --------------------------------------------------
+
+        if (
+            action == "start"
+            or (symptom and not action)
+        ):
+
+            result = start_aws_troubleshooting(
+                symptom
+            )
+
+        # --------------------------------------------------
+        # FOLLOW DECISION
+        # --------------------------------------------------
+
+        elif action == "decision":
+
+            current_step = request.form.get(
+                "current_step"
+            )
+
+            decision_result = request.form.get(
+                "decision_result"
+            )
+
+            if (
+                current_step
+                and decision_result
+            ):
+
+                result = get_next_aws_step(
+                    current_step,
+                    decision_result
+                )
+
+    return render_template(
+        "aws_network_ai.html",
+        result=result
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

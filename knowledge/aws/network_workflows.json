@@ -1,0 +1,647 @@
+{
+  "workflow": {
+    "id": "aws_network",
+    "name": "AWS Network Troubleshooting",
+    "platform": "AWS",
+    "version": "0.1",
+    "description": "Guided AWS network troubleshooting using packet-path and configuration-state reasoning."
+  },
+
+  "entry_points": {
+
+    "ec2_no_internet": {
+      "title": "EC2 Cannot Reach Internet",
+      "description": "Use when an EC2 instance cannot reach an internet destination.",
+      "first_step": "check_ec2_network_state"
+    },
+
+    "cannot_connect_ec2": {
+      "title": "Cannot Connect to EC2",
+      "description": "Use when a client cannot establish connectivity to an EC2 instance.",
+      "first_step": "check_ec2_network_state"
+    },
+
+    "vpc_to_vpc_failure": {
+      "title": "VPC-to-VPC Traffic Failure",
+      "description": "Use when resources in different VPCs cannot communicate.",
+      "first_step": "check_vpc_route"
+    },
+
+    "onprem_to_aws_failure": {
+      "title": "On-Premises to AWS Failure",
+      "description": "Use when traffic between an on-premises network and AWS is failing.",
+      "first_step": "check_hybrid_attachment"
+    }
+
+  },
+
+ "steps": {
+
+  "check_ec2_network_state": {
+    "title": "Check EC2 Network State",
+    "risk": "safe",
+    "purpose": "Confirm the instance and its network interface are in the expected operational state before troubleshooting routing or security controls.",
+
+    "recommended_checks": [
+      "Confirm the EC2 instance is running",
+      "Confirm the expected ENI is attached",
+      "Confirm the expected private IPv4 address",
+      "For public internet connectivity, determine whether the instance has a public IPv4 address or Elastic IP",
+      "Identify the subnet containing the ENI",
+      "Identify the security groups associated with the ENI"
+    ],
+
+    "decision": {
+      "instance_network_ok": "check_subnet_route",
+      "instance_or_eni_problem": "ec2_network_failure"
+    }
+  },
+  "check_subnet_route": {
+  "title": "Check Subnet Route",
+  "risk": "safe",
+  "purpose": "Verify that the subnet route table sends the destination toward the expected next hop.",
+
+  "recommended_checks": [
+    "Identify the route table associated with the EC2 subnet",
+    "Check the route that matches the destination IP or prefix",
+    "Confirm the next hop is the expected target",
+    "For internet traffic, determine whether the subnet is intended to be public or private",
+    "Check for a more specific route that may override the expected path"
+  ],
+
+  "decision": {
+    "internet_public_subnet": "check_public_internet_path",
+    "internet_private_subnet": "check_private_internet_path",
+    "vpc_route_correct": "check_security_group",
+    "route_wrong_or_missing": "routing_failure"
+  }
+},
+"check_public_internet_path": {
+  "title": "Check Public Internet Path",
+  "risk": "safe",
+  "purpose": "Verify that a public subnet instance has the addressing and routing needed to reach the internet through an Internet Gateway.",
+
+  "recommended_checks": [
+    "Confirm the subnet route table has 0.0.0.0/0 pointing to an Internet Gateway",
+    "Confirm the Internet Gateway is attached to the correct VPC",
+    "Confirm the EC2 network interface has a public IPv4 address or Elastic IP",
+    "Confirm the instance private IP and public IP mapping are as expected",
+    "After the route and public addressing are confirmed, continue to Security Group checks"
+  ],
+
+  "decision": {
+    "public_path_correct": "check_security_group",
+    "missing_public_ip": "public_ip_failure",
+    "igw_missing_or_wrong": "internet_gateway_failure",
+    "default_route_wrong_or_missing": "routing_failure"
+  }
+},
+
+"check_private_internet_path": {
+  "title": "Check Private Internet Path",
+  "risk": "safe",
+  "purpose": "Verify that a private subnet uses the expected NAT path for outbound internet connectivity.",
+
+  "recommended_checks": [
+    "Confirm the private subnet route table has 0.0.0.0/0 pointing to the expected NAT Gateway",
+    "Confirm the NAT Gateway is in an available state",
+    "Confirm the NAT Gateway is located in the intended public subnet",
+    "Confirm the NAT Gateway public subnet has a default route to an Internet Gateway",
+    "Confirm the Internet Gateway is attached to the VPC",
+    "Check for more specific routes that could override the NAT Gateway path",
+    "After the NAT path is confirmed, continue to Security Group checks"
+  ],
+
+  "decision": {
+    "nat_path_correct": "check_security_group",
+    "nat_gateway_unavailable": "nat_gateway_failure",
+    "nat_route_wrong_or_missing": "routing_failure",
+    "nat_public_subnet_problem": "nat_gateway_failure"
+  }
+},
+"check_security_group": {
+  "title": "Check Security Group",
+  "risk": "safe",
+  "purpose": "Verify that the security groups associated with the EC2 network interface allow the required traffic.",
+
+  "recommended_checks": [
+    "Identify every security group attached to the EC2 network interface",
+    "For inbound connectivity, verify the required protocol and destination port are allowed from the expected source",
+    "For outbound connectivity, verify the required destination and protocol are allowed",
+    "Check whether the rule uses an IP CIDR, prefix list, or another security group as the source or destination",
+    "Verify that the source address seen by the EC2 instance matches what the security group rule expects",
+    "Remember that security groups are stateful, so return traffic for an allowed connection does not require a separate reverse-direction rule"
+  ],
+
+  "decision": {
+    "security_group_correct": "check_network_acl",
+    "inbound_rule_missing": "security_group_failure",
+    "outbound_rule_missing": "security_group_failure",
+    "wrong_source_or_destination": "security_group_failure"
+  }
+},
+"check_network_acl": {
+  "title": "Check Network ACL",
+  "risk": "safe",
+  "purpose": "Verify that the subnet network ACL permits both the forward and return traffic required by the connection.",
+
+  "recommended_checks": [
+    "Identify the network ACL associated with the EC2 subnet",
+    "Review inbound rules in rule-number order",
+    "Review outbound rules in rule-number order",
+    "Confirm the required protocol is permitted",
+    "Confirm the service port is permitted in the appropriate direction",
+    "Confirm return traffic and required ephemeral ports are permitted",
+    "Look for a lower-numbered deny rule that matches before the expected allow rule",
+    "Confirm the source and destination CIDRs match the actual packet path"
+  ],
+
+  "decision": {
+    "network_acl_correct": "check_flow_evidence",
+    "inbound_acl_blocked": "network_acl_failure",
+    "outbound_acl_blocked": "network_acl_failure",
+    "return_ephemeral_ports_blocked": "network_acl_failure"
+  }
+},
+"check_flow_evidence": {
+  "title": "Collect AWS Network Evidence",
+  "risk": "safe",
+  "purpose": "Use AWS network observability tools to confirm whether the configured path is reachable and whether traffic is being accepted or rejected.",
+
+  "recommended_checks": [
+    "Use Reachability Analyzer to test the expected source-to-destination path",
+    "Review the path explanation and identify any route table, security group, network ACL, gateway, peering, or Transit Gateway component reported as blocking the path",
+    "Review VPC Flow Logs at the ENI, subnet, or VPC level for the source and destination traffic",
+    "Check whether the relevant flow is marked ACCEPT or REJECT",
+    "Correlate the Flow Log timestamp with the actual connectivity test",
+    "Remember that Reachability Analyzer evaluates configuration and does not transmit test packets",
+    "If Reachability Analyzer reports a valid path but traffic still fails, continue with workload, operating-system, return-path, or application-level checks"
+  ],
+
+  "decision": {
+    "reachability_blocked": "analyze_aws_blocking_component",
+    "flow_log_reject": "analyze_flow_log_reject",
+    "path_reachable_no_traffic": "check_workload_or_return_path",
+    "traffic_accepted": "aws_network_path_working"
+  }
+},
+"ec2_network_failure": {
+  "title": "EC2 Network State Problem",
+  "risk": "safe",
+  "purpose": "The instance or its primary network interface is not in the expected state, so higher-layer routing and security troubleshooting should pause here.",
+
+  "likely_causes": [
+    "EC2 instance is not running",
+    "Expected ENI is not attached",
+    "Unexpected private IP address",
+    "Wrong subnet",
+    "Wrong network interface selected for the workload",
+    "Unexpected security group association"
+  ],
+
+  "recommended_checks": [
+    "Confirm the EC2 instance state",
+    "Confirm the expected ENI is attached",
+    "Verify the ENI private IPv4 address",
+    "Verify the subnet ID",
+    "Verify the security groups attached to the ENI",
+    "Correct the instance or ENI state before continuing with route troubleshooting"
+  ]
+},
+
+"public_ip_failure": {
+  "title": "Public IP Addressing Problem",
+  "risk": "safe",
+  "purpose": "The public-subnet path requires appropriate public IPv4 addressing for direct IPv4 internet communication through an Internet Gateway.",
+
+  "likely_causes": [
+    "Instance has no public IPv4 address",
+    "Elastic IP is not associated with the expected network interface",
+    "Public IP is associated with the wrong instance or ENI",
+    "The subnet was expected to auto-assign public IPv4 addresses but does not"
+  ],
+
+  "recommended_checks": [
+    "Verify the EC2 private and public IPv4 addressing",
+    "Verify Elastic IP association if one is used",
+    "Confirm the public address belongs to the intended ENI",
+    "Confirm the subnet design is intended to provide direct public internet access"
+  ]
+},
+
+"internet_gateway_failure": {
+  "title": "Internet Gateway Path Problem",
+  "risk": "safe",
+  "purpose": "The expected public internet path through the Internet Gateway is missing or misconfigured.",
+
+  "likely_causes": [
+    "No Internet Gateway attached to the VPC",
+    "Wrong Internet Gateway associated with the design",
+    "Subnet route table does not send internet traffic to the Internet Gateway",
+    "A more specific route sends traffic somewhere else"
+  ],
+
+  "recommended_checks": [
+    "Verify an Internet Gateway is attached to the VPC",
+    "Verify the subnet route table",
+    "Confirm the expected internet route targets the Internet Gateway",
+    "Check for more specific routes that override the expected internet path"
+  ]
+},
+
+"nat_gateway_failure": {
+  "title": "NAT Gateway Path Problem",
+  "risk": "safe",
+  "purpose": "The private-subnet internet path through the NAT Gateway is not usable.",
+
+  "likely_causes": [
+    "NAT Gateway is not available",
+    "Private subnet route does not point to the intended NAT Gateway",
+    "NAT Gateway is deployed in the wrong subnet",
+    "NAT Gateway public subnet does not have a usable Internet Gateway path",
+    "Security or subnet controls are blocking the expected traffic",
+    "The traffic uses a protocol or path not supported by the intended NAT design"
+  ],
+
+  "recommended_checks": [
+    "Verify NAT Gateway state",
+    "Verify the private subnet default route",
+    "Verify the NAT Gateway subnet",
+    "Verify the NAT Gateway subnet has an Internet Gateway route",
+    "Verify the VPC Internet Gateway attachment",
+    "Check security and Network ACL behavior along the path"
+  ]
+},
+
+"routing_failure": {
+  "title": "AWS Routing Failure",
+  "risk": "safe",
+  "purpose": "The AWS route table does not provide the expected path toward the destination.",
+
+  "likely_causes": [
+    "Destination route is missing",
+    "Route points to the wrong target",
+    "A more specific route overrides the expected route",
+    "Wrong route table is associated with the subnet",
+    "Expected propagated route is absent",
+    "Return route is missing on another routing domain"
+  ],
+
+  "recommended_checks": [
+    "Identify the route table actually associated with the source subnet",
+    "Find the most specific route matching the destination",
+    "Verify the target is correct",
+    "Check propagated routes where applicable",
+    "Verify the return path from the destination side"
+  ]
+},
+
+"security_group_failure": {
+  "title": "Security Group Failure",
+  "risk": "safe",
+  "purpose": "The resource security group does not allow the traffic required by the application path.",
+
+  "likely_causes": [
+    "Required inbound rule is missing",
+    "Required outbound rule is missing",
+    "Source CIDR is incorrect",
+    "Destination CIDR is incorrect",
+    "Wrong protocol or destination port",
+    "Traffic source address is different from what the rule expects",
+    "Wrong security group is attached to the ENI"
+  ],
+
+  "recommended_checks": [
+    "Identify all security groups attached to the ENI",
+    "Verify protocol and port",
+    "Verify source/destination CIDR or security-group reference",
+    "Verify the address actually seen by the resource",
+    "Remember that security groups are stateful"
+  ]
+},
+
+"network_acl_failure": {
+  "title": "Network ACL Failure",
+  "risk": "safe",
+  "purpose": "The subnet Network ACL is blocking the forward path, return path, or required ephemeral traffic.",
+
+  "likely_causes": [
+    "Inbound traffic denied",
+    "Outbound traffic denied",
+    "Return traffic not permitted",
+    "Required ephemeral ports are not permitted",
+    "A lower-numbered deny rule matches before the intended allow rule",
+    "CIDR in the ACL does not match the actual source or destination"
+  ],
+
+  "recommended_checks": [
+    "Review inbound rules in rule-number order",
+    "Review outbound rules in rule-number order",
+    "Verify protocol and service port",
+    "Verify required return traffic",
+    "Verify ephemeral-port requirements for the actual workload",
+    "Check the first matching rule in each direction"
+  ]
+},
+
+"analyze_aws_blocking_component": {
+  "title": "Reachability Analyzer Found a Blocking Component",
+  "risk": "safe",
+  "purpose": "Use the Reachability Analyzer explanation to identify the configuration element preventing the expected path.",
+
+  "recommended_checks": [
+    "Identify the component or explanation code reported by Reachability Analyzer",
+    "Determine whether the blocker is a route table, Security Group, Network ACL, gateway, peering connection, Transit Gateway, or another supported component",
+    "Return to the relevant troubleshooting section instead of changing unrelated components",
+    "Re-run the analysis after the configuration is corrected"
+  ]
+},
+
+"analyze_flow_log_reject": {
+  "title": "VPC Flow Logs Show REJECT",
+  "risk": "safe",
+  "purpose": "Observed traffic reached a logged VPC interface or boundary but was rejected by the evaluated network controls.",
+
+  "recommended_checks": [
+    "Confirm source IP, destination IP, protocol and ports in the Flow Log record",
+    "Confirm the Flow Log timestamp matches the test",
+    "Check Security Group rules for the relevant resource",
+    "Check Network ACL rules for the relevant subnet",
+    "Correlate the reject with the exact direction of the traffic"
+  ]
+},
+
+"check_workload_or_return_path": {
+  "title": "AWS Network Path Appears Reachable",
+  "risk": "safe",
+  "purpose": "AWS configuration analysis indicates a valid network path, so continue with return-path, operating-system, listening-service, or application troubleshooting.",
+
+  "likely_causes": [
+    "Operating-system firewall",
+    "Application not listening on the expected port",
+    "Wrong bind address",
+    "Asymmetric or missing return route outside the analyzed path",
+    "Application-level failure",
+    "Incorrect DNS destination",
+    "Workload health issue"
+  ],
+
+  "recommended_checks": [
+    "Verify the application is listening on the intended IP and port",
+    "Check the instance operating-system firewall",
+    "Check the destination workload health",
+    "Verify the reverse path",
+    "Confirm DNS resolves to the expected destination",
+    "Use packet capture or host-level tools where appropriate"
+  ]
+},
+
+"aws_network_path_working": {
+  "title": "AWS Network Path Appears to Be Working",
+  "risk": "safe",
+  "purpose": "The AWS networking evidence indicates that traffic is accepted and the expected virtual network path is available.",
+
+  "recommended_checks": [
+    "Confirm the application itself is healthy",
+    "Verify host operating-system networking",
+    "Verify DNS if a hostname is used",
+    "Check application logs and listening sockets",
+    "Preserve the network evidence showing the AWS path is functioning"
+  ]
+},
+"check_vpc_route": {
+  "title": "Check VPC-to-VPC Routing",
+  "risk": "safe",
+  "purpose": "Verify that the source VPC route table sends the destination VPC prefix toward the intended VPC Peering Connection or Transit Gateway.",
+
+  "recommended_checks": [
+    "Identify the source subnet route table",
+    "Find the most specific route matching the destination VPC CIDR",
+    "Confirm the route target is the expected VPC Peering Connection or Transit Gateway",
+    "Verify the destination VPC has a return route toward the source VPC CIDR",
+    "Check for overlapping CIDR ranges",
+    "Confirm the route table associated with the actual workload subnet is the one being reviewed"
+  ],
+
+  "decision": {
+    "peering_route": "check_vpc_peering",
+    "transit_gateway_route": "check_tgw_attachment",
+    "route_wrong_or_missing": "routing_failure",
+    "overlapping_cidr": "vpc_cidr_overlap_failure"
+  }
+},
+"check_vpc_peering": {
+  "title": "Check VPC Peering Path",
+  "risk": "safe",
+  "purpose": "Verify that the VPC Peering Connection is usable and that both VPCs have the required routes for bidirectional communication.",
+
+  "recommended_checks": [
+    "Confirm the VPC Peering Connection is active",
+    "Verify the source VPC route table points the destination CIDR to the peering connection",
+    "Verify the destination VPC route table points the source CIDR to the peering connection",
+    "Confirm the VPC CIDR ranges do not overlap",
+    "After routing is confirmed, validate Security Groups and Network ACLs on the destination path"
+  ],
+
+  "decision": {
+    "peering_path_correct": "check_security_group",
+    "peering_not_active": "vpc_peering_failure",
+    "return_route_missing": "routing_failure",
+    "overlapping_cidr": "vpc_cidr_overlap_failure"
+  }
+},
+"check_tgw_attachment": {
+  "title": "Check Transit Gateway Attachment",
+  "risk": "safe",
+  "purpose": "Verify that the source and destination networks are correctly attached to the Transit Gateway and are using the intended Transit Gateway route-table relationships.",
+
+  "recommended_checks": [
+    "Confirm the source VPC attachment is available",
+    "Confirm the destination VPC or VPN attachment is available",
+    "Identify the Transit Gateway route table associated with the source attachment",
+    "Verify the destination prefix exists in that Transit Gateway route table",
+    "Check whether the destination attachment is propagated to the required Transit Gateway route table",
+    "Verify the return direction uses the appropriate association and route propagation",
+    "Confirm the VPC subnet route tables point the remote prefixes toward the Transit Gateway"
+  ],
+
+  "decision": {
+    "tgw_path_correct": "check_security_group",
+    "attachment_problem": "tgw_attachment_failure",
+    "association_problem": "tgw_route_table_failure",
+    "propagation_missing": "tgw_route_table_failure",
+    "tgw_route_missing": "tgw_route_table_failure"
+  }
+},
+"onprem_to_aws_failure": {
+  "first_step": "check_hybrid_attachment"
+},
+"check_hybrid_attachment": {
+  "title": "Check Hybrid AWS Attachment",
+  "risk": "safe",
+  "purpose": "Identify whether on-premises connectivity reaches AWS through a Site-to-Site VPN attached to a Virtual Private Gateway or Transit Gateway.",
+
+  "recommended_checks": [
+    "Identify whether the VPN terminates on a Virtual Private Gateway or Transit Gateway",
+    "Confirm the AWS Site-to-Site VPN connection exists",
+    "Check both VPN tunnel states",
+    "Determine whether routing uses static routes or BGP",
+    "Confirm the on-premises and AWS CIDR ranges expected across the VPN",
+    "Identify the VPC subnet route table used by the destination workload"
+  ],
+
+  "decision": {
+    "vpn_vgw": "check_vgw_vpn",
+    "vpn_tgw": "check_tgw_vpn",
+    "vpn_attachment_down": "site_to_site_vpn_failure"
+  }
+},
+"check_vgw_vpn": {
+  "title": "Check Virtual Private Gateway VPN Path",
+  "risk": "safe",
+  "purpose": "Verify Site-to-Site VPN state and routing when the VPN terminates on a Virtual Private Gateway.",
+
+  "recommended_checks": [
+    "Confirm at least one Site-to-Site VPN tunnel is UP",
+    "For dynamic routing, confirm BGP is established and expected prefixes are advertised and received",
+    "For static routing, confirm the expected static prefixes are configured",
+    "Verify the VPC subnet route table contains the on-premises prefix",
+    "If route propagation is used, confirm Virtual Private Gateway propagation is enabled on the relevant route table",
+    "Verify the customer gateway has a return route toward the AWS VPC CIDR"
+  ],
+
+  "decision": {
+    "vpn_and_routes_correct": "check_security_group",
+    "tunnel_down": "site_to_site_vpn_failure",
+    "bgp_down": "site_to_site_vpn_failure",
+    "aws_route_missing": "routing_failure",
+    "onprem_return_route_missing": "hybrid_return_path_failure"
+  }
+},
+"check_tgw_vpn": {
+  "title": "Check Transit Gateway VPN Path",
+  "risk": "safe",
+  "purpose": "Verify Site-to-Site VPN routing when the VPN terminates on an AWS Transit Gateway.",
+
+  "recommended_checks": [
+    "Confirm at least one VPN tunnel is UP",
+    "For dynamic routing, verify BGP session state and advertised/received prefixes",
+    "Confirm the VPN attachment is associated with the intended Transit Gateway route table",
+    "Confirm VPN routes are propagated or statically present in the required Transit Gateway route table",
+    "Confirm the destination VPC attachment is reachable through that Transit Gateway route table",
+    "Verify the destination VPC subnet route table points the on-premises prefix toward the Transit Gateway",
+    "Verify the on-premises router has a return route toward the AWS VPC CIDR"
+  ],
+
+  "decision": {
+    "vpn_tgw_path_correct": "check_security_group",
+    "tunnel_down": "site_to_site_vpn_failure",
+    "bgp_down": "site_to_site_vpn_failure",
+    "tgw_route_problem": "tgw_route_table_failure",
+    "vpc_route_missing": "routing_failure",
+    "onprem_return_route_missing": "hybrid_return_path_failure"
+  }
+},
+"vpc_cidr_overlap_failure": {
+  "title": "Overlapping VPC CIDR Problem",
+  "risk": "safe",
+  "purpose": "The VPC addressing plan prevents the expected straightforward routed connectivity.",
+
+  "likely_causes": [
+    "Source and destination VPC CIDR ranges overlap",
+    "A destination prefix is ambiguous because of overlapping address space"
+  ],
+
+  "recommended_checks": [
+    "Confirm both VPC CIDR ranges",
+    "Review the addressing design",
+    "Determine whether renumbering, NAT, or an alternate architecture is required"
+  ]
+},
+
+"vpc_peering_failure": {
+  "title": "VPC Peering Failure",
+  "risk": "safe",
+  "purpose": "The expected VPC Peering Connection is not currently usable.",
+
+  "recommended_checks": [
+    "Verify peering connection state",
+    "Verify both VPC route tables",
+    "Verify non-overlapping CIDRs",
+    "Verify destination Security Groups and Network ACLs after peering is restored"
+  ]
+},
+
+"tgw_attachment_failure": {
+  "title": "Transit Gateway Attachment Failure",
+  "risk": "safe",
+  "purpose": "One or more required Transit Gateway attachments are not in the expected state.",
+
+  "recommended_checks": [
+    "Verify source attachment state",
+    "Verify destination attachment state",
+    "Confirm the correct VPC/VPN resources are attached",
+    "Verify accepted/shared attachment state for cross-account designs"
+  ]
+},
+
+"tgw_route_table_failure": {
+  "title": "Transit Gateway Routing Failure",
+  "risk": "safe",
+  "purpose": "Transit Gateway routing does not provide the expected path between attachments.",
+
+  "likely_causes": [
+    "Wrong Transit Gateway route-table association",
+    "Route propagation disabled or missing",
+    "Destination prefix missing",
+    "Static route points to the wrong attachment",
+    "Return direction uses a different route table without the required route"
+  ],
+
+  "recommended_checks": [
+    "Identify the Transit Gateway route table associated with the source attachment",
+    "Verify the destination prefix",
+    "Verify the destination attachment target",
+    "Review propagations",
+    "Repeat the same analysis for the return direction"
+  ]
+},
+
+"site_to_site_vpn_failure": {
+  "title": "AWS Site-to-Site VPN Failure",
+  "risk": "safe",
+  "purpose": "The AWS Site-to-Site VPN or its routing adjacency is not fully operational.",
+
+  "recommended_checks": [
+    "Check both tunnel states",
+    "Verify IKE and IPsec state on the customer gateway",
+    "For BGP, verify neighbor state and advertisements",
+    "For static routing, verify configured prefixes",
+    "Review AWS Site-to-Site VPN logs if enabled",
+    "Verify both directions of routing before changing security controls"
+  ]
+},
+
+"hybrid_return_path_failure": {
+  "title": "Hybrid Return Path Failure",
+  "risk": "safe",
+  "purpose": "The forward path reaches AWS but the on-premises or AWS return route does not correctly return traffic to the source.",
+
+  "likely_causes": [
+    "On-premises route to AWS CIDR is missing",
+    "AWS route to on-premises CIDR is missing",
+    "BGP advertisement missing in one direction",
+    "Different VPN/TGW path selected on return",
+    "Asymmetric routing through another firewall or WAN path"
+  ],
+
+  "recommended_checks": [
+    "Verify the AWS route toward the on-premises prefix",
+    "Verify the on-premises route toward the AWS prefix",
+    "Compare BGP advertisements and learned routes in both directions",
+    "Check whether the forward and reverse paths use the same expected VPN/TGW architecture",
+    "Correlate firewall session state where applicable"
+  ]
+}
+}
+}

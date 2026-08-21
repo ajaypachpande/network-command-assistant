@@ -1,9 +1,7 @@
 <!doctype html>
-
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -19,7 +17,6 @@
         rel="stylesheet"
         href="/static/style.css"
     >
-
 </head>
 
 
@@ -30,43 +27,76 @@
 
 <main>
 
-
-    <!-- ==================================================
+    <!-- =====================================================
          PAGE HEADER
-    =================================================== -->
+    ====================================================== -->
 
     <div class="section-label">
         AUTOMATION · TERRAFORM
     </div>
 
-
     <h1>
         Terraform for Network Engineers
     </h1>
 
-
     <p>
-        Learn Terraform step by step, starting with setup and
-        the Terraform lifecycle, then use small AWS examples
-        such as Route 53 hosted zones and DNS records.
+        Learn Terraform from a network engineering perspective.
+        Start with the AWS provider and Terraform lifecycle,
+        then build Route 53 infrastructure and generate reusable
+        Terraform configuration.
     </p>
 
 
+    <!-- =====================================================
+         LEARNING FLOW
+    ====================================================== -->
 
-    <!-- ==================================================
-         LEARNING MODULES
-    =================================================== -->
+    <div class="card">
+
+        <h2>
+            Terraform Learning Path
+        </h2>
+
+        <pre>
+01 Setup
+    |
+    v
+02 AWS Provider
+    |
+    v
+03 Terraform Lifecycle
+    |
+    v
+04 AWS Route 53 Lab
+    |
+    v
+05 Terraform Generator
+        </pre>
+
+        <p>
+            The goal is to understand the Terraform workflow
+            before moving into larger AWS networking resources
+            such as VPCs, subnets, route tables, security groups,
+            NAT gateways, Transit Gateway, and VPN.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         TERRAFORM MODULE CARDS
+    ====================================================== -->
 
     <div class="device-grid">
 
 
-        <!-- ==============================================
+        <!-- =================================================
              01 SETUP
-        =============================================== -->
+        ================================================== -->
 
         <a
             class="device-card"
-            href="#setup"
+            href="/automation/terraform"
         >
 
             <div class="device-icon">
@@ -74,20 +104,21 @@
             </div>
 
             <strong>
-                Setup
+                Terraform Setup
             </strong>
 
             <span>
-                Install Terraform and verify the CLI.
+                Understand what Terraform is, how the CLI works,
+                the basic configuration structure, and how it
+                fits into infrastructure automation.
             </span>
 
         </a>
 
 
-
-        <!-- ==============================================
+        <!-- =================================================
              02 AWS PROVIDER
-        =============================================== -->
+        ================================================== -->
 
         <a
             class="device-card"
@@ -103,17 +134,17 @@
             </strong>
 
             <span>
-                Learn how Terraform Core uses the AWS Provider
-                to communicate with AWS services.
+                Learn where the AWS provider sits between
+                Terraform configuration and AWS infrastructure,
+                and how provider configuration works.
             </span>
 
         </a>
 
 
-
-        <!-- ==============================================
+        <!-- =================================================
              03 TERRAFORM LIFECYCLE
-        =============================================== -->
+        ================================================== -->
 
         <a
             class="device-card"
@@ -129,16 +160,17 @@
             </strong>
 
             <span>
-                init → fmt → validate → plan → apply → destroy
+                Follow the workflow from terraform init through
+                validate, plan, apply, state management, change,
+                and destroy.
             </span>
 
         </a>
 
 
-
-        <!-- ==============================================
-             04 ROUTE 53
-        =============================================== -->
+        <!-- =================================================
+             04 ROUTE 53 LAB
+        ================================================== -->
 
         <a
             class="device-card"
@@ -154,8 +186,35 @@
             </strong>
 
             <span>
-                Learn hosted zones, domain records and
-                subdomain DNS records.
+                Learn how Terraform represents a Route 53
+                hosted zone, DNS records, domains, and
+                subdomains using a practical AWS example.
+            </span>
+
+        </a>
+
+
+        <!-- =================================================
+             05 TERRAFORM GENERATOR
+        ================================================== -->
+
+        <a
+            class="device-card"
+            href="/automation/terraform/generator"
+        >
+
+            <div class="device-icon">
+                05
+            </div>
+
+            <strong>
+                Terraform Generator
+            </strong>
+
+            <span>
+                Enter Route 53 variables and automatically
+                generate Terraform HCL, Terraform JSON,
+                and a portable YAML specification.
             </span>
 
         </a>
@@ -164,183 +223,377 @@
     </div>
 
 
-
-    <!-- ==================================================
-         TERRAFORM SETUP LESSON
-    =================================================== -->
-
-    <div
-        class="section-label"
-        id="setup"
-    >
-        TERRAFORM · LESSON 01
-    </div>
-
+    <!-- =====================================================
+         GENERATOR ARCHITECTURE
+    ====================================================== -->
 
     <div class="card">
 
-        <h2>
-            Terraform Setup
-        </h2>
-
-
-        <p>
-            Terraform is an Infrastructure as Code tool.
-            Infrastructure is described using configuration files,
-            and Terraform determines what changes are required.
-        </p>
-
-
-        <h3>
-            Basic Architecture
-        </h3>
-
-
-        <pre>
-Engineer
-   |
-   v
-Terraform Configuration
-   |
-   v
-Terraform CLI
-   |
-   v
-Provider
-   |
-   v
-Cloud / Infrastructure API
-   |
-   v
-Infrastructure
-        </pre>
-
-
-        <h3>
-            Installation Goal
-        </h3>
-
-
-        <p>
-            Terraform must be installed on the workstation and
-            available through the operating system PATH.
-        </p>
-
-
-        <div class="terminal-title">
-            VERIFY TERRAFORM
+        <div class="section-label">
+            TERRAFORM GENERATOR
         </div>
 
+        <h2>
+            Generate Infrastructure Configuration
+        </h2>
 
-        <pre>terraform version</pre>
+        <p>
+            The Terraform Generator uses one normalized
+            configuration model to produce multiple output
+            formats.
+        </p>
+
+        <pre>
+User Variables
+      |
+      v
+Input Validation
+      |
+      v
+Normalized Python Model
+      |
+      +-----------------+-----------------+
+      |                 |                 |
+      v                 v                 v
+Terraform HCL     Terraform JSON       YAML
+      |                 |                 |
+      v                 v                 v
+   main.tf          main.tf.json      config.yaml
+        </pre>
 
 
-        <div class="terminal-title">
-            COMMAND HELP
+        <div class="quick">
+
+            <a href="/automation/terraform/generator">
+                Open Terraform Generator
+            </a>
+
         </div>
 
+    </div>
 
-        <pre>terraform -help</pre>
+
+    <!-- =====================================================
+         CURRENT GENERATOR SUPPORT
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Current Generator Support
+        </h2>
+
+        <p>
+            The first generator release focuses on AWS Route 53.
+        </p>
+
+        <pre>
+AWS Route 53
+│
+├── Hosted Zone
+│
+├── Record Name
+│
+├── Record Type
+│   ├── A
+│   ├── AAAA
+│   ├── CNAME
+│   └── TXT
+│
+├── Record Value
+│
+├── TTL
+│
+└── AWS Region
+        </pre>
+
+        <p>
+            The same input is validated and then rendered into
+            HCL, Terraform-compatible JSON, and the portal's
+            YAML specification.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         TERRAFORM FILE FORMATS
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Generated Formats
+        </h2>
 
 
         <h3>
-            Windows Setup Checklist
+            Terraform HCL
         </h3>
 
+        <p>
+            Standard Terraform configuration written to a
+            file such as:
+        </p>
 
-        <ul>
+        <pre>main.tf</pre>
 
-            <li>
-                Download and install Terraform.
-            </li>
 
-            <li>
-                Ensure the Terraform executable is available on PATH.
-            </li>
+        <h3>
+            Terraform JSON
+        </h3>
 
-            <li>
-                Open a new PowerShell terminal.
-            </li>
+        <p>
+            Terraform also supports configuration expressed
+            using its JSON syntax.
+        </p>
 
-            <li>
-                Run <code>terraform version</code>.
-            </li>
+        <pre>main.tf.json</pre>
 
-            <li>
-                Confirm Terraform responds before creating a project.
-            </li>
 
-        </ul>
+        <h3>
+            YAML Specification
+        </h3>
 
+        <p>
+            YAML is used by this portal as a portable
+            configuration representation. Terraform does not
+            directly execute this YAML file.
+        </p>
+
+        <pre>config.yaml</pre>
 
     </div>
 
 
-
-    <!-- ==================================================
-         PROJECT STRUCTURE
-    =================================================== -->
+    <!-- =====================================================
+         SECURITY / KNOWLEDGE MODE
+    ====================================================== -->
 
     <div class="card">
 
+        <div class="section-label">
+            KNOWLEDGE-SHARING MODE
+        </div>
+
         <h2>
-            Typical Terraform Project Structure
+            No AWS Credentials Required
         </h2>
 
-
-        <pre>
-terraform-project/
-|
-+-- versions.tf
-+-- provider.tf
-+-- variables.tf
-+-- main.tf
-+-- outputs.tf
-`-- terraform.tfvars
-        </pre>
-
-
         <p>
-            Each file has a different responsibility, but Terraform
-            reads all <code>.tf</code> files in the current working
-            directory as one configuration.
+            The current Terraform portal is designed for
+            learning, documentation, and configuration
+            generation.
         </p>
 
+        <pre>
+Portal
+   |
+   +--> Does NOT store AWS credentials
+   |
+   +--> Does NOT call AWS APIs
+   |
+   +--> Does NOT run terraform apply
+   |
+   +--> Does NOT run terraform destroy
+   |
+   `--> Generates configuration for engineer review
+        </pre>
+
+        <p>
+            This keeps configuration generation separate from
+            infrastructure execution.
+        </p>
 
     </div>
 
 
-
-    <!-- ==================================================
-         LEARNING FLOW
-    =================================================== -->
+    <!-- =====================================================
+         TERRAFORM WORKFLOW
+    ====================================================== -->
 
     <div class="card">
 
         <h2>
-            Recommended Learning Order
+            Terraform Workflow
         </h2>
 
-
         <pre>
-01 Setup
-   |
-   v
-02 AWS Provider
-   |
-   v
-03 Terraform Lifecycle
-   |
-   v
-04 Route 53 Lab
+Write / Generate Configuration
+            |
+            v
+      terraform init
+            |
+            v
+      terraform fmt
+            |
+            v
+    terraform validate
+            |
+            v
+      terraform plan
+            |
+            v
+      Engineer Review
+            |
+            v
+      terraform apply
+            |
+            v
+     Infrastructure
         </pre>
 
+        <div class="warn">
+
+            <strong>
+                Learning Portal
+            </strong>
+
+            <p>
+                The application currently stops at configuration
+                generation. Terraform execution remains a
+                separate engineer-controlled activity.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FUTURE NETWORK AUTOMATION
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="section-label">
+            FUTURE SCOPE
+        </div>
+
+        <h2>
+            AWS Network Terraform Generator
+        </h2>
 
         <p>
-            Learn the provider relationship before moving into
-            resource creation.
+            Route 53 gives us the foundation. The same generator
+            architecture can later support additional AWS
+            networking resources.
         </p>
 
+        <pre>
+Route 53                 CURRENT
+    |
+    v
+VPC
+    |
+    v
+Subnets
+    |
+    v
+Route Tables
+    |
+    v
+Internet Gateway
+    |
+    v
+Security Groups
+    |
+    v
+Network ACLs
+    |
+    v
+NAT Gateway
+    |
+    v
+Transit Gateway
+    |
+    v
+Site-to-Site VPN
+        </pre>
+
+    </div>
+
+
+    <!-- =====================================================
+         FUTURE NETWORK AI RELATIONSHIP
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Future NetworkAI Integration
+        </h2>
+
+        <p>
+            In a later release, the troubleshooting and
+            automation engines could work together while still
+            keeping infrastructure changes under engineer
+            control.
+        </p>
+
+        <pre>
+NetworkAI Troubleshooting
+          |
+          v
+Identify Configuration Problem
+          |
+          v
+Example:
+Missing Route
+          |
+          v
+Recommend Terraform Resource
+          |
+          v
+Terraform Generator
+          |
+          +--> HCL
+          +--> JSON
+          `--> YAML
+          |
+          v
+Engineer Review
+          |
+          v
+Manual / Authorized Deployment
+        </pre>
+
+    </div>
+
+
+    <!-- =====================================================
+         QUICK NAVIGATION
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Quick Navigation
+        </h2>
+
+        <div class="quick">
+
+            <a href="/automation">
+                Automation
+            </a>
+
+            <a href="/automation/terraform/aws-provider">
+                AWS Provider
+            </a>
+
+            <a href="/automation/terraform/lifecycle">
+                Terraform Lifecycle
+            </a>
+
+            <a href="/automation/terraform/aws-route53">
+                Route 53 Lab
+            </a>
+
+            <a href="/automation/terraform/generator">
+                Terraform Generator
+            </a>
+
+        </div>
 
     </div>
 
@@ -349,7 +602,6 @@ terraform-project/
 
 
 <script src="/static/app.js"></script>
-
 
 </body>
 

@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Terraform Configuration Generator
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+{% include "partials/navbar.html" %}
+
+
+<main>
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="section-label">
+        AUTOMATION · TERRAFORM · GENERATOR
+    </div>
+
+
+    <h1>
+        Terraform Configuration Generator
+    </h1>
+
+
+    <p>
+        Enter AWS Route 53 variables and generate reusable
+        Terraform configuration in HCL, Terraform JSON,
+        and YAML formats.
+    </p>
+
+
+    <!-- =====================================================
+         EDUCATIONAL NOTICE
+    ====================================================== -->
+
+    <div class="card">
+
+        <strong>
+            KNOWLEDGE-SHARING MODE
+        </strong>
+
+        <p>
+            This tool generates Terraform configuration only.
+            It does not connect to AWS, execute Terraform,
+            run terraform apply, or require AWS credentials.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ARCHITECTURE
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Generator Flow
+        </h2>
+
+        <pre>
+User Variables
+      |
+      v
+Input Validation
+      |
+      v
+Normalized Python Model
+      |
+      +-----------------+-----------------+
+      |                 |                 |
+      v                 v                 v
+Terraform HCL     Terraform JSON       YAML
+      |                 |                 |
+      v                 v                 v
+   main.tf          main.tf.json      config.yaml
+        </pre>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         INPUT FORM
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Route 53 Variables
+        </h2>
+
+
+        <p>
+            Enter the values you want to use for the learning
+            Route 53 configuration.
+        </p>
+
+
+        <form method="POST">
+
+
+            <!-- DOMAIN -->
+
+            <label for="domain_name">
+                <strong>
+                    Domain Name
+                </strong>
+            </label>
+
+            <input
+                id="domain_name"
+                type="text"
+                name="domain_name"
+                placeholder="example.com"
+                value="{{ form_data.domain_name }}"
+                required
+            >
+
+
+            <br><br>
+
+
+            <!-- REGION -->
+
+            <label for="region">
+                <strong>
+                    AWS Region
+                </strong>
+            </label>
+
+            <select
+                id="region"
+                name="region"
+            >
+
+                {% set regions = [
+                    "us-east-1",
+                    "us-east-2",
+                    "us-west-1",
+                    "us-west-2",
+                    "ca-central-1",
+                    "eu-west-1",
+                    "eu-central-1",
+                    "ap-south-1",
+                    "ap-southeast-1",
+                    "ap-southeast-2"
+                ] %}
+
+
+                {% for region in regions %}
+
+                <option
+                    value="{{ region }}"
+                    {% if form_data.region == region %}
+                    selected
+                    {% endif %}
+                >
+                    {{ region }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <br><br>
+
+
+            <!-- RECORD NAME -->
+
+            <label for="record_name">
+                <strong>
+                    Record Name
+                </strong>
+            </label>
+
+            <input
+                id="record_name"
+                type="text"
+                name="record_name"
+                placeholder="www"
+                value="{{ form_data.record_name }}"
+                required
+            >
+
+
+            <p>
+                Examples:
+                <code>www</code>,
+                <code>app</code>,
+                or a complete name such as
+                <code>app.example.com</code>.
+            </p>
+
+
+            <!-- RECORD TYPE -->
+
+            <label for="record_type">
+                <strong>
+                    DNS Record Type
+                </strong>
+            </label>
+
+            <select
+                id="record_type"
+                name="record_type"
+            >
+
+                {% set record_types = [
+                    "A",
+                    "AAAA",
+                    "CNAME",
+                    "TXT"
+                ] %}
+
+
+                {% for record_type in record_types %}
+
+                <option
+                    value="{{ record_type }}"
+                    {% if form_data.record_type == record_type %}
+                    selected
+                    {% endif %}
+                >
+                    {{ record_type }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <br><br>
+
+
+            <!-- RECORD VALUE -->
+
+            <label for="record_value">
+                <strong>
+                    Record Value
+                </strong>
+            </label>
+
+            <input
+                id="record_value"
+                type="text"
+                name="record_value"
+                placeholder="192.0.2.10"
+                value="{{ form_data.record_value }}"
+                required
+            >
+
+
+            <p>
+                For an A record, enter an IPv4 address.
+                Example documentation address:
+                <code>192.0.2.10</code>.
+            </p>
+
+
+            <!-- TTL -->
+
+            <label for="ttl">
+                <strong>
+                    TTL
+                </strong>
+            </label>
+
+            <input
+                id="ttl"
+                type="number"
+                name="ttl"
+                min="1"
+                max="86400"
+                value="{{ form_data.ttl }}"
+                required
+            >
+
+
+            <p>
+                Time to Live in seconds.
+                Example:
+                <code>300</code>.
+            </p>
+
+
+            <button
+                type="submit"
+                style="
+                    width: 100%;
+                    margin-top: 12px;
+                    padding: 14px;
+                "
+            >
+                GENERATE TERRAFORM
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RESULT EXISTS
+    ====================================================== -->
+
+    {% if result %}
+
+
+        <!-- =================================================
+             VALIDATION FAILED
+        ================================================== -->
+
+        {% if not result.success %}
+
+
+        <div class="card">
+
+            <h2>
+                Validation Failed
+            </h2>
+
+
+            <div class="warn">
+
+                <strong>
+                    Fix the following input problems:
+                </strong>
+
+
+                <ul>
+
+                    {% for error in result.errors %}
+
+                    <li>
+                        {{ error }}
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             GENERATION SUCCESSFUL
+        ================================================== -->
+
+        {% else %}
+
+
+        <div class="card">
+
+            <div>
+
+                <strong>
+                    TERRAFORM GENERATION COMPLETE
+                </strong>
+
+                <span class="risk safe">
+                    SAFE
+                </span>
+
+            </div>
+
+
+            <h2>
+                Generated Configuration
+            </h2>
+
+
+            <p>
+                The same normalized Route 53 configuration has
+                been rendered into three different formats.
+            </p>
+
+
+            <pre>
+Normalized Route 53 Model
+        |
+        +--> Terraform HCL
+        |
+        +--> Terraform JSON
+        |
+        `--> YAML Specification
+            </pre>
+
+        </div>
+
+
+
+        <!-- =================================================
+             HCL OUTPUT
+        ================================================== -->
+
+        <div class="card">
+
+            <h2>
+                Terraform HCL
+            </h2>
+
+
+            <p>
+                Standard Terraform configuration suitable for
+                a file such as:
+            </p>
+
+            <pre>main.tf</pre>
+
+
+            <div class="terminal-title">
+                TERRAFORM HCL
+            </div>
+
+
+            <div class="terraform-output">
+
+                <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="terraform-hcl-output"
+                >
+                    Copy HCL
+                </button>
+
+
+                <pre
+                    id="terraform-hcl-output"
+                ><code>{{ result.hcl }}</code></pre>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TERRAFORM JSON OUTPUT
+        ================================================== -->
+
+        <div class="card">
+
+            <h2>
+                Terraform JSON
+            </h2>
+
+
+            <p>
+                Terraform-compatible JSON syntax suitable for:
+            </p>
+
+            <pre>main.tf.json</pre>
+
+
+            <div class="terminal-title">
+                TERRAFORM JSON
+            </div>
+
+
+            <div class="terraform-output">
+
+                <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="terraform-json-output"
+                >
+                    Copy JSON
+                </button>
+
+
+                <pre
+                    id="terraform-json-output"
+                ><code>{{ result.json }}</code></pre>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             YAML OUTPUT
+        ================================================== -->
+
+        <div class="card">
+
+            <h2>
+                YAML Specification
+            </h2>
+
+
+            <p>
+                This YAML is the portal's portable configuration
+                format.
+            </p>
+
+
+            <p>
+                Terraform does not execute YAML directly.
+                The YAML specification can later be converted
+                by this application into Terraform HCL or
+                Terraform JSON.
+            </p>
+
+
+            <div class="terminal-title">
+                YAML
+            </div>
+
+
+            <div class="terraform-output">
+
+                <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="terraform-yaml-output"
+                >
+                    Copy YAML
+                </button>
+
+
+                <pre
+                    id="terraform-yaml-output"
+                ><code>{{ result.yaml }}</code></pre>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             HOW TO USE
+        ================================================== -->
+
+        <div class="card">
+
+            <h2>
+                How This Would Be Used
+            </h2>
+
+
+            <pre>
+Generated HCL
+    |
+    v
+Save as main.tf
+    |
+    v
+terraform init
+    |
+    v
+terraform fmt
+    |
+    v
+terraform validate
+    |
+    v
+terraform plan
+    |
+    v
+Engineer reviews plan
+    |
+    v
+terraform apply
+        </pre>
+
+
+            <div class="warn">
+
+                <strong>
+                    Important
+                </strong>
+
+                <p>
+                    This portal does not run these commands.
+                    Actual Terraform execution must be performed
+                    separately in an authorized environment.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% endif %}
+
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         FUTURE RESOURCE SUPPORT
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Planned Generator Expansion
+        </h2>
+
+
+        <pre>
+Route 53                  CURRENT
+    |
+    v
+VPC
+    |
+    v
+Subnets
+    |
+    v
+Route Tables
+    |
+    v
+Security Groups
+    |
+    v
+Network ACLs
+    |
+    v
+Internet Gateway
+    |
+    v
+NAT Gateway
+    |
+    v
+Transit Gateway
+    |
+    v
+Site-to-Site VPN
+        </pre>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Terraform Learning
+        </h2>
+
+
+        <p>
+            Use the other Terraform lessons to understand the
+            generated configuration.
+        </p>
+
+
+        <div class="quick">
+
+
+            <a href="/automation/terraform">
+                Terraform Portal
+            </a>
+
+
+            <a href="/automation/terraform/aws-provider">
+                AWS Provider
+            </a>
+
+
+            <a href="/automation/terraform/lifecycle">
+                Lifecycle
+            </a>
+
+
+            <a href="/automation/terraform/aws-route53">
+                Route 53 Lab
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+</main>
+
+
+
+<!-- =========================================================
+     COPY OUTPUT SCRIPT
+========================================================== -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const copyButtons =
+            document.querySelectorAll(
+                "[data-copy-target]"
+            );
+
+
+        copyButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    async function () {
+
+                        const targetId =
+                            button.getAttribute(
+                                "data-copy-target"
+                            );
+
+
+                        const target =
+                            document.getElementById(
+                                targetId
+                            );
+
+
+                        if (!target) {
+                            return;
+                        }
+
+
+                        const text =
+                            target.innerText;
+
+
+                        try {
+
+                            await navigator.clipboard.writeText(
+                                text
+                            );
+
+
+                            const originalText =
+                                button.innerText;
+
+
+                            button.innerText =
+                                "Copied ✓";
+
+
+                            setTimeout(
+                                function () {
+
+                                    button.innerText =
+                                        originalText;
+
+                                },
+                                1500
+                            );
+
+                        }
+
+                        catch (error) {
+
+                            console.error(
+                                "Copy failed:",
+                                error
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
+
+<script src="/static/app.js"></script>
+
+
+</body>
+
+</html>

@@ -9,6 +9,7 @@ from ai.aws_network import (
     start_aws_troubleshooting,
     get_next_step as get_next_aws_step
 )
+from terraform_generator.generator import generate_route53_terraform
 
 app = Flask(__name__)
 
@@ -340,6 +341,65 @@ def terraform_route53_complete():
 @app.route("/automation/terraform/lifecycle")
 def terraform_lifecycle():
     return render_template("terraform_lifecycle.html")
+@app.route(
+    "/automation/terraform/generator",
+    methods=["GET", "POST"]
+)
+def terraform_generator():
+    result = None
+
+    form_data = {
+        "domain_name": "",
+        "region": "us-east-1",
+        "record_name": "",
+        "record_type": "A",
+        "record_value": "",
+        "ttl": "300"
+    }
+
+    if request.method == "POST":
+
+        form_data = {
+            "domain_name": request.form.get(
+                "domain_name",
+                ""
+            ),
+            "region": request.form.get(
+                "region",
+                "us-east-1"
+            ),
+            "record_name": request.form.get(
+                "record_name",
+                ""
+            ),
+            "record_type": request.form.get(
+                "record_type",
+                "A"
+            ),
+            "record_value": request.form.get(
+                "record_value",
+                ""
+            ),
+            "ttl": request.form.get(
+                "ttl",
+                "300"
+            )
+        }
+
+        result = generate_route53_terraform(
+            domain_name=form_data["domain_name"],
+            region=form_data["region"],
+            record_name=form_data["record_name"],
+            record_type=form_data["record_type"],
+            record_value=form_data["record_value"],
+            ttl=form_data["ttl"]
+        )
+
+    return render_template(
+        "terraform_generator.html",
+        result=result,
+        form_data=form_data
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

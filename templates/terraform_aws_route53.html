@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Terraform AWS Route 53 Lab
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+
+<body>
+
+{% include "partials/navbar.html" %}
+
+
+<main>
+
+    <div class="section-label">
+        TERRAFORM · AWS · ROUTE 53
+    </div>
+
+
+    <h1>
+        Route 53 Hosted Zone and Subdomain Lab
+    </h1>
+
+
+    <p>
+        Learn how Terraform can describe a Route 53 public hosted zone
+        and create DNS records for a domain and subdomain.
+    </p>
+
+
+    <div class="card">
+
+        <h2>
+            Learning Goal
+        </h2>
+
+        <p>
+            Understand the relationship between a domain,
+            a Route 53 hosted zone, and DNS records.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Architecture
+        </h2>
+
+        <pre>
+example.com
+    |
+    v
+Route 53 Hosted Zone
+    |
+    +---- www.example.com
+    |
+    `---- app.example.com
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Important DNS Concept
+        </h2>
+
+        <pre>
+Domain Registration
+        !=
+Route 53 Hosted Zone
+        !=
+DNS Record
+        </pre>
+
+        <p>
+            These are separate concepts.
+        </p>
+
+        <p>
+            A domain can be registered with one registrar while DNS
+            is hosted in Route 53.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Terraform File Structure
+        </h2>
+
+        <pre>
+aws-route53/
+|
+|-- versions.tf
+|-- provider.tf
+|-- variables.tf
+|-- main.tf
+|-- outputs.tf
+`-- terraform.tfvars.example
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            versions.tf
+        </h2>
+
+        <div class="terminal-title">
+            versions.tf
+        </div>
+
+        <pre><code>terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}</code></pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            provider.tf
+        </h2>
+
+        <div class="terminal-title">
+            provider.tf
+        </div>
+
+        <pre><code>provider "aws" {
+  region = var.aws_region
+}</code></pre>
+
+        <p>
+            This portal is educational only.
+            No AWS credentials are required to study this example.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            variables.tf
+        </h2>
+
+        <div class="terminal-title">
+            variables.tf
+        </div>
+
+        <pre><code>variable "aws_region" {
+  description = "AWS region used by the provider."
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "domain_name" {
+  description = "Domain for the hosted zone."
+  type        = string
+}
+
+variable "www_ipv4" {
+  description = "IPv4 address for the www record."
+  type        = string
+}
+
+variable "app_ipv4" {
+  description = "IPv4 address for the app subdomain."
+  type        = string
+}</code></pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            main.tf
+        </h2>
+
+        <div class="terminal-title">
+            main.tf
+        </div>
+
+        <pre><code>resource "aws_route53_zone" "primary" {
+  name = var.domain_name
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "www.${var.domain_name}"
+  type    = "A"
+  ttl     = 300
+
+  records = [
+    var.www_ipv4
+  ]
+}
+
+resource "aws_route53_record" "app" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "app.${var.domain_name}"
+  type    = "A"
+  ttl     = 300
+
+  records = [
+    var.app_ipv4
+  ]
+}</code></pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            What Terraform Is Describing
+        </h2>
+
+        <pre>
+aws_route53_zone.primary
+        |
+        v
+example.com Hosted Zone
+        |
+        +------ aws_route53_record.www
+        |          |
+        |          v
+        |     www.example.com
+        |
+        `------ aws_route53_record.app
+                   |
+                   v
+              app.example.com
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            outputs.tf
+        </h2>
+
+        <div class="terminal-title">
+            outputs.tf
+        </div>
+
+        <pre><code>output "hosted_zone_id" {
+  value = aws_route53_zone.primary.zone_id
+}
+
+output "name_servers" {
+  value = aws_route53_zone.primary.name_servers
+}
+
+output "www_record" {
+  value = aws_route53_record.www.fqdn
+}
+
+output "app_record" {
+  value = aws_route53_record.app.fqdn
+}</code></pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            terraform.tfvars.example
+        </h2>
+
+        <div class="terminal-title">
+            terraform.tfvars.example
+        </div>
+
+        <pre><code>aws_region  = "us-east-1"
+domain_name = "example.com"
+
+www_ipv4 = "192.0.2.10"
+app_ipv4 = "192.0.2.20"</code></pre>
+
+        <p>
+            These are documentation-only example addresses.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Terraform Workflow
+        </h2>
+
+        <pre>
+terraform init
+      |
+      v
+terraform fmt
+      |
+      v
+terraform validate
+      |
+      v
+terraform plan
+      |
+      v
+Review changes
+      |
+      v
+terraform apply
+      |
+      v
+Verify Route 53
+      |
+      v
+terraform destroy
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Learning Safety
+        </h2>
+
+        <div class="warn">
+
+            <strong>
+                Important
+            </strong>
+
+            <p>
+                Do not store AWS credentials in Terraform source files.
+                Do not commit Terraform state or secret variable files.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Next Step
+        </h2>
+
+        <a href="/automation/terraform/lifecycle">
+            Continue to Terraform Lifecycle →
+        </a>
+
+        <br><br>
+
+        <a href="/automation/terraform">
+            ← Back to Terraform Portal
+        </a>
+
+    </div>
+
+
+</main>
+
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>

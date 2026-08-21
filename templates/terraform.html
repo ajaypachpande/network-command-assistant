@@ -1,0 +1,356 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Terraform for Network Engineers
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+
+<body>
+
+{% include "partials/navbar.html" %}
+
+
+<main>
+
+
+    <!-- ==================================================
+         PAGE HEADER
+    =================================================== -->
+
+    <div class="section-label">
+        AUTOMATION · TERRAFORM
+    </div>
+
+
+    <h1>
+        Terraform for Network Engineers
+    </h1>
+
+
+    <p>
+        Learn Terraform step by step, starting with setup and
+        the Terraform lifecycle, then use small AWS examples
+        such as Route 53 hosted zones and DNS records.
+    </p>
+
+
+
+    <!-- ==================================================
+         LEARNING MODULES
+    =================================================== -->
+
+    <div class="device-grid">
+
+
+        <!-- ==============================================
+             01 SETUP
+        =============================================== -->
+
+        <a
+            class="device-card"
+            href="#setup"
+        >
+
+            <div class="device-icon">
+                01
+            </div>
+
+            <strong>
+                Setup
+            </strong>
+
+            <span>
+                Install Terraform and verify the CLI.
+            </span>
+
+        </a>
+
+
+
+        <!-- ==============================================
+             02 AWS PROVIDER
+        =============================================== -->
+
+        <a
+            class="device-card"
+            href="/automation/terraform/aws-provider"
+        >
+
+            <div class="device-icon">
+                02
+            </div>
+
+            <strong>
+                AWS Provider
+            </strong>
+
+            <span>
+                Learn how Terraform Core uses the AWS Provider
+                to communicate with AWS services.
+            </span>
+
+        </a>
+
+
+
+        <!-- ==============================================
+             03 TERRAFORM LIFECYCLE
+        =============================================== -->
+
+        <a
+            class="device-card"
+            href="/automation/terraform/lifecycle"
+        >
+
+            <div class="device-icon">
+                03
+            </div>
+
+            <strong>
+                Terraform Lifecycle
+            </strong>
+
+            <span>
+                init → fmt → validate → plan → apply → destroy
+            </span>
+
+        </a>
+
+
+
+        <!-- ==============================================
+             04 ROUTE 53
+        =============================================== -->
+
+        <a
+            class="device-card"
+            href="/automation/terraform/aws-route53"
+        >
+
+            <div class="device-icon">
+                04
+            </div>
+
+            <strong>
+                AWS Route 53 Lab
+            </strong>
+
+            <span>
+                Learn hosted zones, domain records and
+                subdomain DNS records.
+            </span>
+
+        </a>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         TERRAFORM SETUP LESSON
+    =================================================== -->
+
+    <div
+        class="section-label"
+        id="setup"
+    >
+        TERRAFORM · LESSON 01
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Terraform Setup
+        </h2>
+
+
+        <p>
+            Terraform is an Infrastructure as Code tool.
+            Infrastructure is described using configuration files,
+            and Terraform determines what changes are required.
+        </p>
+
+
+        <h3>
+            Basic Architecture
+        </h3>
+
+
+        <pre>
+Engineer
+   |
+   v
+Terraform Configuration
+   |
+   v
+Terraform CLI
+   |
+   v
+Provider
+   |
+   v
+Cloud / Infrastructure API
+   |
+   v
+Infrastructure
+        </pre>
+
+
+        <h3>
+            Installation Goal
+        </h3>
+
+
+        <p>
+            Terraform must be installed on the workstation and
+            available through the operating system PATH.
+        </p>
+
+
+        <div class="terminal-title">
+            VERIFY TERRAFORM
+        </div>
+
+
+        <pre>terraform version</pre>
+
+
+        <div class="terminal-title">
+            COMMAND HELP
+        </div>
+
+
+        <pre>terraform -help</pre>
+
+
+        <h3>
+            Windows Setup Checklist
+        </h3>
+
+
+        <ul>
+
+            <li>
+                Download and install Terraform.
+            </li>
+
+            <li>
+                Ensure the Terraform executable is available on PATH.
+            </li>
+
+            <li>
+                Open a new PowerShell terminal.
+            </li>
+
+            <li>
+                Run <code>terraform version</code>.
+            </li>
+
+            <li>
+                Confirm Terraform responds before creating a project.
+            </li>
+
+        </ul>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         PROJECT STRUCTURE
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Typical Terraform Project Structure
+        </h2>
+
+
+        <pre>
+terraform-project/
+|
++-- versions.tf
++-- provider.tf
++-- variables.tf
++-- main.tf
++-- outputs.tf
+`-- terraform.tfvars
+        </pre>
+
+
+        <p>
+            Each file has a different responsibility, but Terraform
+            reads all <code>.tf</code> files in the current working
+            directory as one configuration.
+        </p>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEARNING FLOW
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Recommended Learning Order
+        </h2>
+
+
+        <pre>
+01 Setup
+   |
+   v
+02 AWS Provider
+   |
+   v
+03 Terraform Lifecycle
+   |
+   v
+04 Route 53 Lab
+        </pre>
+
+
+        <p>
+            Learn the provider relationship before moving into
+            resource creation.
+        </p>
+
+
+    </div>
+
+
+</main>
+
+
+<script src="/static/app.js"></script>
+
+
+</body>
+
+</html>

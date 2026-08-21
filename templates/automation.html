@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Automation</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+{% include "partials/navbar.html" %}
+
+<main>
+  <div class="section-label">NETWORK ENGINEERING · AUTOMATION</div>
+
+  <h1>Network Automation</h1>
+  <p>
+    Learn infrastructure and network automation using repeatable,
+    reviewable workflows.
+  </p>
+
+  <div class="device-grid">
+
+    <a class="device-card" href="/automation/terraform">
+      <div class="device-icon">[TF]</div>
+      <strong>Terraform</strong>
+      <span>
+        Infrastructure as Code fundamentals, AWS provider setup,
+        plan/apply lifecycle, Route 53, and reusable examples.
+      </span>
+    </a>
+
+    <div class="device-card">
+      <div class="device-icon">[A]</div>
+      <strong>Ansible</strong>
+      <span>Planned for a future release.</span>
+    </div>
+
+    <div class="device-card">
+      <div class="device-icon">[PY]</div>
+      <strong>Python Automation</strong>
+      <span>Planned for a future release.</span>
+    </div>
+
+  </div>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
+7. Step 6 - Terraform Landing Page (Jinja)
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terraform Learning Portal</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+{% include "partials/navbar.html" %}
+
+<main>
+  <div class="section-label">AUTOMATION · TERRAFORM</div>
+
+  <h1>Terraform for Network Engineers</h1>
+
+  <p>
+    Start with setup and the Terraform lifecycle, then build a small
+    AWS Route 53 DNS example.
+  </p>
+
+  <div class="device-grid">
+
+    <div class="device-card">
+      <div class="device-icon">01</div>
+      <strong>Setup</strong>
+      <span>Install Terraform and verify the CLI.</span>
+    </div>
+
+    <div class="device-card">
+      <div class="device-icon">02</div>
+      <strong>AWS Provider</strong>
+      <span>Understand provider requirements and authentication.</span>
+    </div>
+
+    <div class="device-card">
+      <div class="device-icon">03</div>
+      <strong>Terraform Lifecycle</strong>
+      <span>init → fmt → validate → plan → apply → destroy</span>
+    </div>
+
+    <a class="device-card" href="/automation/terraform/aws-route53">
+      <div class="device-icon">04</div>
+      <strong>AWS Route 53 Lab</strong>
+      <span>Create a hosted zone and DNS/subdomain records.</span>
+    </a>
+
+  </div>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

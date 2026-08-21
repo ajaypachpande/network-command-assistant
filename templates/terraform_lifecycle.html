@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        Terraform Lifecycle | Network Command Assistant
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+
+<body>
+
+{% include "partials/navbar.html" %}
+
+
+<main>
+
+    <div class="section-label">
+        AUTOMATION · TERRAFORM · LIFECYCLE
+    </div>
+
+
+    <h1>
+        Terraform Lifecycle
+    </h1>
+
+
+    <p>
+        Learn the normal Terraform workflow from project initialization
+        through planning, applying, inspecting state, and cleanup.
+    </p>
+
+
+    <div class="card">
+
+        <h2>
+            Learning Objective
+        </h2>
+
+        <p>
+            Understand what each Terraform lifecycle command does
+            and why the order matters.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Lifecycle Overview
+        </h2>
+
+        <div class="terminal-title">
+            TERRAFORM WORKFLOW
+        </div>
+
+        <pre>
+terraform init
+      |
+      v
+terraform fmt
+      |
+      v
+terraform validate
+      |
+      v
+terraform plan
+      |
+      v
+Review proposed changes
+      |
+      v
+terraform apply
+      |
+      v
+Verify resources
+      |
+      v
+terraform state list
+      |
+      v
+terraform destroy
+when cleanup is intentionally required
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            1. terraform init
+        </h2>
+
+        <p>
+            Initializes the Terraform working directory and prepares
+            provider dependencies.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform init</pre>
+
+        <pre>
+Read configuration
+      |
+      v
+Find required providers
+      |
+      v
+Initialize provider plugins
+      |
+      v
+Prepare working directory
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            2. terraform fmt
+        </h2>
+
+        <p>
+            Formats Terraform configuration into a consistent style.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform fmt -recursive</pre>
+
+        <p>
+            This is a formatting step. It does not create infrastructure.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            3. terraform validate
+        </h2>
+
+        <p>
+            Checks whether the Terraform configuration is structurally
+            and syntactically valid.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform validate</pre>
+
+        <pre>
+Terraform files
+      |
+      v
+Syntax / configuration checks
+      |
+      +--> Valid
+      |
+      `--> Error found
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            4. terraform plan
+        </h2>
+
+        <p>
+            Builds a proposed execution plan showing what Terraform
+            intends to create, change, or remove.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform plan</pre>
+
+        <pre>
+Configuration
+      |
+      v
+Current state
+      |
+      v
+Terraform compares desired vs current
+      |
+      v
+Execution plan
+      |
+      +--> create
+      +--> update
+      `--> destroy
+        </pre>
+
+        <div class="warn">
+
+            <strong>
+                Important
+            </strong>
+
+            <p>
+                Always review the plan before applying changes.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            5. terraform apply
+        </h2>
+
+        <p>
+            Applies the reviewed Terraform plan and performs the
+            required provider/API operations.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform apply</pre>
+
+        <pre>
+Reviewed plan
+      |
+      v
+Terraform Core
+      |
+      v
+Provider
+      |
+      v
+Cloud / infrastructure API
+      |
+      v
+Resource changes
+        </pre>
+
+        <p>
+            This learning portal does not execute terraform apply.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            6. Terraform State
+        </h2>
+
+        <p>
+            Terraform state records the relationship between Terraform
+            resources and the infrastructure being managed.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform state list</pre>
+
+        <pre>
+Terraform configuration
+        |
+        v
+Terraform state
+        |
+        v
+Known managed resources
+        </pre>
+
+        <div class="warn">
+
+            <strong>
+                Security / Git Rule
+            </strong>
+
+            <p>
+                Do not commit local Terraform state files to Git.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            7. terraform destroy
+        </h2>
+
+        <p>
+            Removes infrastructure managed by the current Terraform
+            configuration when cleanup is intentionally required.
+        </p>
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+        <pre>terraform destroy</pre>
+
+        <p>
+            Review the destroy plan carefully before confirming.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Network Engineer Mental Model
+        </h2>
+
+        <pre>
+DEFINE
+  |
+  v
+INITIALIZE
+  |
+  v
+FORMAT
+  |
+  v
+VALIDATE
+  |
+  v
+PLAN
+  |
+  v
+REVIEW
+  |
+  v
+APPLY
+  |
+  v
+VERIFY
+  |
+  v
+MANAGE STATE
+  |
+  v
+DESTROY ONLY WHEN INTENDED
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Quick Reference
+        </h2>
+
+        <pre>
+terraform init
+    = initialize working directory
+
+terraform fmt
+    = format configuration
+
+terraform validate
+    = validate configuration
+
+terraform plan
+    = preview changes
+
+terraform apply
+    = perform changes
+
+terraform state list
+    = inspect managed resources
+
+terraform destroy
+    = remove managed resources
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Next Lesson
+        </h2>
+
+        <p>
+            After understanding the Terraform lifecycle,
+            continue to the AWS Route 53 example.
+        </p>
+
+        <a href="/automation/terraform/aws-route53">
+            Continue to Route 53 Lab →
+        </a>
+
+        <br><br>
+
+        <a href="/automation/terraform">
+            ← Back to Terraform Portal
+        </a>
+
+    </div>
+
+</main>
+
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>

@@ -312,6 +312,30 @@ def aws_network_ai():
         "aws_network_ai.html",
         result=result
     )
+# ==========================================================
+# AUTOMATION PORTAL
+# ==========================================================
+
+@app.route("/automation")
+def automation():
+    return render_template("automation.html")
+
+
+@app.route("/automation/terraform")
+def terraform_portal():
+    return render_template("terraform.html")
+
+@app.route("/automation/terraform/aws-provider")
+def terraform_aws_provider():
+    return render_template("terraform_aws_provider.html")
+
+@app.route("/automation/terraform/aws-route53")
+def terraform_aws_route53():
+    return render_template("terraform_aws_route53.html")
+
+@app.route("/automation/terraform/lifecycle")
+def terraform_lifecycle():
+    return render_template("terraform_lifecycle.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

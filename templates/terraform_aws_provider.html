@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        AWS Provider | Terraform for Network Engineers
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+
+<body>
+
+{% include "partials/navbar.html" %}
+
+
+<main>
+
+    <div class="section-label">
+        AUTOMATION · TERRAFORM · AWS PROVIDER
+    </div>
+
+
+    <h1>
+        Terraform AWS Provider
+    </h1>
+
+
+    <p>
+        Learn where the AWS Provider sits between Terraform and AWS,
+        why Terraform needs a provider, and how Terraform configuration
+        is translated into AWS infrastructure operations.
+    </p>
+
+
+    <!-- ==================================================
+         LEARNING OBJECTIVE
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Learning Objective
+        </h2>
+
+        <p>
+            After this section, you should understand the relationship
+            between Terraform Core, the HashiCorp AWS Provider,
+            AWS APIs, and AWS resources.
+        </p>
+
+    </div>
+
+
+    <!-- ==================================================
+         PROVIDER CONCEPT
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            What is the AWS Provider?
+        </h2>
+
+        <p>
+            Terraform Core manages configuration, dependencies,
+            state, planning, and the resource lifecycle.
+        </p>
+
+        <p>
+            Terraform Core does not directly know how to create
+            AWS-specific resources.
+        </p>
+
+        <p>
+            The AWS Provider adds the AWS-specific knowledge that
+            Terraform needs to communicate with AWS services.
+        </p>
+
+    </div>
+
+
+    <!-- ==================================================
+         ARCHITECTURE DIAGRAM
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Where Does the AWS Provider Sit?
+        </h2>
+
+
+        <div class="terminal-title">
+            TERRAFORM → AWS ARCHITECTURE
+        </div>
+
+
+        <pre>
+            
+┌──────────────────────────────┐
+│   Terraform Configuration    │
+│                              │
+│ main.tf                      │
+│ variables.tf                 │
+│ outputs.tf                   │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│       Terraform Core         │
+│                              │
+│ • Reads configuration        │
+│ • Builds dependency graph    │
+│ • Creates execution plan     │
+│ • Tracks resource state      │
+└──────────────┬───────────────┘
+               │
+               │ Resource request
+               ▼
+┌──────────────────────────────┐
+│        AWS Provider          │
+│                              │
+│       hashicorp/aws          │
+│                              │
+│ Understands AWS resources    │
+│ and AWS API operations       │
+└──────────────┬───────────────┘
+               │
+               │ AWS API calls
+               ▼
+┌──────────────────────────────┐
+│           AWS APIs           │
+└──────────────┬───────────────┘
+               │
+       ┌───────┼────────┬─────────┐
+       │       │        │         │
+       ▼       ▼        ▼         ▼
+   Route 53   VPC      EC2       TGW
+       │       │        │         │
+       ▼       ▼        ▼         ▼
+      DNS    Routes   ENIs    Attachments
+        </pre>
+
+    </div>
+
+
+    <!-- ==================================================
+         NETWORK ENGINEER MENTAL MODEL
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Network Engineer Mental Model
+        </h2>
+
+        <p>
+            Think of Terraform Core as the orchestration engine and
+            the AWS Provider as the AWS-specific translator.
+        </p>
+
+
+        <div class="terminal-title">
+            CONCEPT
+        </div>
+
+
+        <pre>
+Terraform says:
+
+"I need an AWS Route 53 hosted zone."
+
+              │
+              ▼
+
+AWS Provider understands:
+
+"Terraform is requesting an
+aws_route53_zone resource."
+
+              │
+              ▼
+
+AWS Provider communicates with:
+
+AWS Route 53 API
+
+              │
+              ▼
+
+AWS creates or changes:
+
+Hosted Zone
+        </pre>
+
+    </div>
+
+
+    <!-- ==================================================
+         VERSIONS.TF
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Step 1: versions.tf
+        </h2>
+
+        <p>
+            The required_providers block tells Terraform which
+            provider plugin the configuration requires.
+        </p>
+
+
+        <div class="terminal-title">
+            versions.tf
+        </div>
+
+
+        <pre><code>terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}</code></pre>
+
+
+        <p>
+            In simple terms:
+        </p>
+
+
+        <pre>
+required_providers
+        │
+        ▼
+Which provider do I need?
+        │
+        ▼
+hashicorp/aws
+        </pre>
+
+    </div>
+
+
+    <!-- ==================================================
+         PROVIDER.TF
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Step 2: provider.tf
+        </h2>
+
+        <p>
+            The provider block configures how the AWS Provider
+            should operate.
+        </p>
+
+
+        <div class="terminal-title">
+            provider.tf
+        </div>
+
+
+        <pre><code>provider "aws" {
+  region = var.aws_region
+}</code></pre>
+
+
+        <p>
+            The important distinction is:
+        </p>
+
+
+        <pre>
+versions.tf
+     │
+     ▼
+WHICH provider?
+     │
+     ▼
+hashicorp/aws
+
+
+provider.tf
+     │
+     ▼
+HOW should the provider operate?
+     │
+     ▼
+AWS configuration
+        </pre>
+
+    </div>
+
+
+    <!-- ==================================================
+         TERRAFORM INIT
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Step 3: terraform init
+        </h2>
+
+        <p>
+            Terraform initialization prepares the working directory
+            and installs the providers required by the configuration.
+        </p>
+
+
+        <div class="terminal-title">
+            COMMAND
+        </div>
+
+
+        <pre><code>terraform init</code></pre>
+
+
+        <div class="terminal-title">
+            WHAT HAPPENS
+        </div>
+
+
+        <pre>
+terraform init
+      │
+      ▼
+Read Terraform configuration
+      │
+      ▼
+Find required_providers
+      │
+      ▼
+Identify hashicorp/aws
+      │
+      ▼
+Resolve/install provider
+      │
+      ▼
+Initialize working directory
+      │
+      ▼
+Ready for validate / plan
+        </pre>
+
+    </div>
+
+
+    <!-- ==================================================
+         PROVIDER VS RESOURCE
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Provider vs Resource
+        </h2>
+
+
+        <div class="terminal-title">
+            PROVIDER
+        </div>
+
+
+        <pre><code>provider "aws" {
+  region = var.aws_region
+}</code></pre>
+
+
+        <p>
+            This configures the AWS Provider.
+        </p>
+
+
+        <div class="terminal-title">
+            RESOURCE
+        </div>
+
+
+        <pre><code>resource "aws_route53_zone" "primary" {
+  name = var.domain_name
+}</code></pre>
+
+
+        <p>
+            This describes an AWS resource Terraform should manage.
+        </p>
+
+
+        <pre>
+provider "aws"
+      │
+      │ enables AWS communication
+      ▼
+aws_route53_zone
+      │
+      │ represents infrastructure
+      ▼
+Route 53 Hosted Zone
+        </pre>
+
+    </div>
+
+
+    <!-- ==================================================
+         AUTHENTICATION
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Authentication Concept
+        </h2>
+
+        <p>
+            A real Terraform execution needs an authorized AWS
+            identity before the AWS Provider can perform AWS API
+            operations.
+        </p>
+
+        <p>
+            Authentication information should remain outside the
+            Terraform configuration that is stored in source control.
+        </p>
+
+
+        <div class="warn">
+
+            <strong>
+                Security Rule
+            </strong>
+
+            <p>
+                Never place AWS access keys, secret keys, passwords,
+                or session tokens inside Terraform files committed
+                to Git.
+            </p>
+
+        </div>
+
+
+        <div class="terminal-title">
+            SAFE CONCEPTUAL MODEL
+        </div>
+
+
+        <pre>
+Terraform Configuration
+       │
+       ▼
+AWS Provider
+       │
+       ├── Configuration
+       │     region
+       │
+       └── Authorized AWS identity
+             kept outside source code
+                   │
+                   ▼
+                AWS APIs
+        </pre>
+
+
+        <p>
+            This portal is educational. AWS credentials are not
+            required simply to study these examples.
+        </p>
+
+    </div>
+
+
+    <!-- ==================================================
+         ROUTE 53 CONNECTION
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            How This Connects to Our Route 53 Lab
+        </h2>
+
+
+        <pre>
+Terraform
+    │
+    ▼
+Terraform Core
+    │
+    ▼
+AWS Provider
+    │
+    ▼
+Route 53 API
+    │
+    ├── Hosted Zone
+    │      example.com
+    │
+    ├── DNS Record
+    │      www.example.com
+    │
+    └── DNS Record
+           app.example.com
+        </pre>
+
+
+        <p>
+            The next lab uses this provider relationship to explain
+            how Terraform describes a Route 53 hosted zone and DNS
+            records.
+        </p>
+
+
+        <a href="/automation/terraform/aws-route53">
+            Continue to Route 53 Lab →
+        </a>
+
+    </div>
+
+
+    <!-- ==================================================
+         QUICK REFERENCE
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Quick Reference
+        </h2>
+
+
+        <pre>
+Terraform Core
+    = lifecycle + state + dependency graph + plan
+
+AWS Provider
+    = AWS-specific Terraform integration
+
+versions.tf
+    = which provider is required
+
+provider.tf
+    = provider configuration
+
+terraform init
+    = initialize project and provider
+
+resource
+    = infrastructure Terraform should manage
+
+AWS API
+    = interface used to interact with AWS services
+        </pre>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>
+            Key Takeaway
+        </h2>
+
+        <p>
+            Terraform Core decides what needs to happen.
+            The AWS Provider understands how Terraform resources
+            relate to AWS services and communicates with AWS APIs.
+        </p>
+
+        <p>
+            Keep this relationship in mind:
+        </p>
+
+        <pre>
+Terraform Configuration
+        ↓
+Terraform Core
+        ↓
+AWS Provider
+        ↓
+AWS API
+        ↓
+AWS Resource
+        </pre>
+
+    </div>
+
+
+</main>
+
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>

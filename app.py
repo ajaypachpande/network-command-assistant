@@ -333,6 +333,10 @@ def terraform_aws_provider():
 def terraform_aws_route53():
     return render_template("terraform_aws_route53.html")
 
+@app.route("/automation/terraform/examples/route53-complete")
+def terraform_route53_complete():
+    return render_template("terraform_route53_complete.html")
+
 @app.route("/automation/terraform/lifecycle")
 def terraform_lifecycle():
     return render_template("terraform_lifecycle.html")

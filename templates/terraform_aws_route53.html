@@ -1,7 +1,9 @@
 <!doctype html>
+
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -17,71 +19,130 @@
         rel="stylesheet"
         href="/static/style.css"
     >
+
 </head>
 
 
 <body>
+
 
 {% include "partials/navbar.html" %}
 
 
 <main>
 
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
     <div class="section-label">
-        TERRAFORM · AWS · ROUTE 53
+        AUTOMATION · TERRAFORM · AWS · ROUTE 53
     </div>
 
 
     <h1>
-        Route 53 Hosted Zone and Subdomain Lab
+        Route 53 Hosted Zone and Resume Subdomain Lab
     </h1>
 
 
     <p>
-        Learn how Terraform can describe a Route 53 public hosted zone
-        and create DNS records for a domain and subdomain.
+        Learn how Terraform can describe a public Route 53 hosted zone
+        for <strong>ajaynetwork.com</strong> and create the
+        <strong>resume.ajaynetwork.com</strong> DNS record.
     </p>
 
+
+
+    <!-- =====================================================
+         EDUCATIONAL MODE
+    ====================================================== -->
 
     <div class="card">
 
         <h2>
-            Learning Goal
+            Educational Mode
         </h2>
 
         <p>
-            Understand the relationship between a domain,
-            a Route 53 hosted zone, and DNS records.
+            This page is for learning and knowledge sharing only.
+            The Network Command Assistant does not execute
+            <code>terraform apply</code> or connect to an AWS account.
+        </p>
+
+        <div class="warn">
+
+            <strong>
+                Important
+            </strong>
+
+            <p>
+                Do not place AWS access keys, secret keys,
+                session tokens, passwords, or other credentials
+                inside Terraform files committed to Git.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         GOAL
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Lab Goal
+        </h2>
+
+        <p>
+            Our example infrastructure is:
+        </p>
+
+
+        <pre>
+ajaynetwork.com
+      |
+      v
+Route 53 Public Hosted Zone
+      |
+      +-- NS records
+      |
+      +-- SOA record
+      |
+      `-- resume.ajaynetwork.com
+                |
+                v
+             CNAME
+                |
+                v
+        network-app.ajaynetwork.com
+        </pre>
+
+
+        <p>
+            The target hostname is intentionally an example.
+            Replace it with the real hostname you control
+            when using this configuration in a real environment.
         </p>
 
     </div>
 
 
-    <div class="card">
 
-        <h2>
-            Architecture
-        </h2>
-
-        <pre>
-example.com
-    |
-    v
-Route 53 Hosted Zone
-    |
-    +---- www.example.com
-    |
-    `---- app.example.com
-        </pre>
-
-    </div>
-
+    <!-- =====================================================
+         DNS CONCEPT
+    ====================================================== -->
 
     <div class="card">
 
         <h2>
             Important DNS Concept
         </h2>
+
 
         <pre>
 Domain Registration
@@ -91,91 +152,263 @@ Route 53 Hosted Zone
 DNS Record
         </pre>
 
-        <p>
-            These are separate concepts.
-        </p>
 
         <p>
-            A domain can be registered with one registrar while DNS
-            is hosted in Route 53.
+            These are related, but they are different operations.
         </p>
+
+
+        <ul>
+
+            <li>
+                <strong>Domain registration</strong>
+                controls ownership of the domain name.
+            </li>
+
+            <li>
+                <strong>Route 53 hosted zone</strong>
+                stores DNS records for the domain.
+            </li>
+
+            <li>
+                <strong>DNS records</strong>
+                define names such as
+                <code>resume.ajaynetwork.com</code>.
+            </li>
+
+        </ul>
 
     </div>
 
 
+
+    <!-- =====================================================
+         AUTHORITY / DELEGATION
+    ====================================================== -->
+
     <div class="card">
 
         <h2>
-            Terraform File Structure
+            DNS Authority and Delegation
         </h2>
 
+        <p>
+            Creating a hosted zone in Route 53 does not automatically
+            make Route 53 authoritative for the public domain.
+        </p>
+
+
         <pre>
-aws-route53/
-|
-|-- versions.tf
-|-- provider.tf
-|-- variables.tf
-|-- main.tf
-|-- outputs.tf
-`-- terraform.tfvars.example
+Registrar / Parent DNS
+        |
+        | delegates using NS records
+        v
+Route 53 Hosted Zone
+ajaynetwork.com
+        |
+        v
+DNS records become publicly authoritative
+        </pre>
+
+
+        <p>
+            For this learning example, assume Route 53 will be
+            authoritative for <code>ajaynetwork.com</code>.
+        </p>
+
+
+        <div class="warn">
+
+            <strong>
+                Existing DNS Warning
+            </strong>
+
+            <p>
+                If ajaynetwork.com already uses Cloudflare or another
+                DNS provider, do not change production name servers
+                simply to test this example.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ARCHITECTURE
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Architecture
+        </h2>
+
+
+        <div class="terminal-title">
+            TERRAFORM → AWS ROUTE 53
+        </div>
+
+
+        <pre>
+Terraform Configuration
+        |
+        v
+Terraform Core
+        |
+        v
+AWS Provider
+hashicorp/aws
+        |
+        v
+Route 53 API
+        |
+        v
+aws_route53_zone.ajaynetwork
+        |
+        +-----------------------------+
+        |                             |
+        v                             v
+Hosted Zone                    DNS Record
+ajaynetwork.com                resume.ajaynetwork.com
+                                      |
+                                      v
+                                    CNAME
+                                      |
+                                      v
+                           network-app.ajaynetwork.com
         </pre>
 
     </div>
 
 
+
+    <!-- =====================================================
+         FILE STRUCTURE
+    ====================================================== -->
+
     <div class="card">
 
         <h2>
-            versions.tf
+            Terraform Project Structure
         </h2>
 
-        <div class="terminal-title">
-            versions.tf
-        </div>
 
-        <pre><code>terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.0"
-    }
-  }
-}</code></pre>
+        <pre>
+examples/
+`-- terraform/
+    `-- aws-route53/
+        |
+        +-- versions.tf
+        +-- provider.tf
+        +-- variables.tf
+        +-- main.tf
+        +-- outputs.tf
+        `-- terraform.tfvars.example
+        </pre>
 
     </div>
 
 
+
+    <!-- =====================================================
+         VERSIONS.TF
+    ====================================================== -->
+
     <div class="card">
 
         <h2>
-            provider.tf
+            1. versions.tf
         </h2>
+
+        <p>
+            This tells Terraform which provider the project requires.
+        </p>
+
+
+        <div class="terminal-title">
+            versions.tf
+        </div>
+
+
+        <pre><code>terraform {
+  required_version = "&gt;= 1.6.0"
+
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}</code></pre>
+
+
+        <p>
+            Mental model:
+        </p>
+
+
+        <pre>
+Terraform
+   |
+   | Which provider?
+   v
+hashicorp/aws
+        </pre>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         PROVIDER.TF
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            2. provider.tf
+        </h2>
+
+        <p>
+            The provider block tells the AWS Provider which region
+            to use.
+        </p>
+
 
         <div class="terminal-title">
             provider.tf
         </div>
+
 
         <pre><code>provider "aws" {
   region = var.aws_region
 }</code></pre>
 
+
         <p>
-            This portal is educational only.
-            No AWS credentials are required to study this example.
+            We deliberately do not put AWS credentials here.
         </p>
 
     </div>
 
 
+
+    <!-- =====================================================
+         VARIABLES.TF
+    ====================================================== -->
+
     <div class="card">
 
         <h2>
-            variables.tf
+            3. variables.tf
         </h2>
+
 
         <div class="terminal-title">
             variables.tf
         </div>
+
 
         <pre><code>variable "aws_region" {
   description = "AWS region used by the provider."
@@ -184,145 +417,253 @@ aws-route53/
 }
 
 variable "domain_name" {
-  description = "Domain for the hosted zone."
+  description = "Public Route 53 hosted zone."
   type        = string
+  default     = "ajaynetwork.com"
 }
 
-variable "www_ipv4" {
-  description = "IPv4 address for the www record."
+variable "resume_hostname" {
+  description = "Resume subdomain name."
   type        = string
+  default     = "resume"
 }
 
-variable "app_ipv4" {
-  description = "IPv4 address for the app subdomain."
+variable "resume_target" {
+  description = "Hostname that resume.ajaynetwork.com points to."
   type        = string
+  default     = "network-app.ajaynetwork.com"
 }</code></pre>
 
     </div>
 
 
+
+    <!-- =====================================================
+         MAIN.TF
+    ====================================================== -->
+
     <div class="card">
 
         <h2>
-            main.tf
+            4. main.tf
         </h2>
+
+        <p>
+            This is the main infrastructure definition.
+        </p>
+
 
         <div class="terminal-title">
             main.tf
         </div>
 
-        <pre><code>resource "aws_route53_zone" "primary" {
+
+        <pre><code># ==========================================================
+# ROUTE 53 PUBLIC HOSTED ZONE
+# ==========================================================
+
+resource "aws_route53_zone" "ajaynetwork" {
   name = var.domain_name
+
+  tags = {
+    Name        = "ajaynetwork.com"
+    Environment = "learning"
+    ManagedBy   = "Terraform"
+  }
 }
 
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "www.${var.domain_name}"
-  type    = "A"
-  ttl     = 300
+
+# ==========================================================
+# RESUME SUBDOMAIN
+# resume.ajaynetwork.com
+# ==========================================================
+
+resource "aws_route53_record" "resume" {
+  zone_id = aws_route53_zone.ajaynetwork.zone_id
+
+  name = "${var.resume_hostname}.${var.domain_name}"
+
+  type = "CNAME"
+
+  ttl = 300
 
   records = [
-    var.www_ipv4
-  ]
-}
-
-resource "aws_route53_record" "app" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "app.${var.domain_name}"
-  type    = "A"
-  ttl     = 300
-
-  records = [
-    var.app_ipv4
+    var.resume_target
   ]
 }</code></pre>
 
     </div>
 
 
+
+    <!-- =====================================================
+         RESOURCE DEPENDENCY
+    ====================================================== -->
+
     <div class="card">
 
         <h2>
-            What Terraform Is Describing
+            How Terraform Understands the Dependency
         </h2>
 
+
         <pre>
-aws_route53_zone.primary
+aws_route53_zone.ajaynetwork
+            |
+            | provides zone_id
+            v
+aws_route53_record.resume
+            |
+            v
+resume.ajaynetwork.com
+        </pre>
+
+
+        <p>
+            Terraform sees this expression:
+        </p>
+
+
+        <pre><code>zone_id = aws_route53_zone.ajaynetwork.zone_id</code></pre>
+
+
+        <p>
+            That creates an implicit dependency.
+            Terraform knows the hosted zone must exist before
+            the DNS record can reference its zone ID.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         OUTPUTS.TF
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            5. outputs.tf
+        </h2>
+
+
+        <div class="terminal-title">
+            outputs.tf
+        </div>
+
+
+        <pre><code>output "hosted_zone_id" {
+  description = "Route 53 hosted zone ID."
+  value       = aws_route53_zone.ajaynetwork.zone_id
+}
+
+
+output "route53_name_servers" {
+  description = "Authoritative Route 53 name servers for ajaynetwork.com."
+  value       = aws_route53_zone.ajaynetwork.name_servers
+}
+
+
+output "resume_record" {
+  description = "Created resume DNS record."
+  value       = aws_route53_record.resume.fqdn
+}
+
+
+output "resume_target" {
+  description = "Hostname used as the CNAME target."
+  value       = var.resume_target
+}</code></pre>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         TFVARS EXAMPLE
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            6. terraform.tfvars.example
+        </h2>
+
+
+        <div class="terminal-title">
+            terraform.tfvars.example
+        </div>
+
+
+        <pre><code>aws_region = "us-east-1"
+
+domain_name = "ajaynetwork.com"
+
+resume_hostname = "resume"
+
+# Replace this with the real hostname
+# that should receive resume traffic.
+
+resume_target = "network-app.ajaynetwork.com"</code></pre>
+
+
+        <p>
+            Keep the example file in Git as documentation.
+            Do not store secrets in it.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         COMPLETE RESULT
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            What This Configuration Describes
+        </h2>
+
+
+        <pre>
+Terraform Resource #1
+
+aws_route53_zone.ajaynetwork
         |
         v
-example.com Hosted Zone
+Public Hosted Zone
+ajaynetwork.com
+
+
+Terraform Resource #2
+
+aws_route53_record.resume
         |
-        +------ aws_route53_record.www
-        |          |
-        |          v
-        |     www.example.com
+        v
+resume.ajaynetwork.com
         |
-        `------ aws_route53_record.app
-                   |
-                   v
-              app.example.com
+        | CNAME
+        v
+network-app.ajaynetwork.com
         </pre>
 
     </div>
 
 
-    <div class="card">
 
-        <h2>
-            outputs.tf
-        </h2>
-
-        <div class="terminal-title">
-            outputs.tf
-        </div>
-
-        <pre><code>output "hosted_zone_id" {
-  value = aws_route53_zone.primary.zone_id
-}
-
-output "name_servers" {
-  value = aws_route53_zone.primary.name_servers
-}
-
-output "www_record" {
-  value = aws_route53_record.www.fqdn
-}
-
-output "app_record" {
-  value = aws_route53_record.app.fqdn
-}</code></pre>
-
-    </div>
-
-
-    <div class="card">
-
-        <h2>
-            terraform.tfvars.example
-        </h2>
-
-        <div class="terminal-title">
-            terraform.tfvars.example
-        </div>
-
-        <pre><code>aws_region  = "us-east-1"
-domain_name = "example.com"
-
-www_ipv4 = "192.0.2.10"
-app_ipv4 = "192.0.2.20"</code></pre>
-
-        <p>
-            These are documentation-only example addresses.
-        </p>
-
-    </div>
-
+    <!-- =====================================================
+         TERRAFORM WORKFLOW
+    ====================================================== -->
 
     <div class="card">
 
         <h2>
             Terraform Workflow
         </h2>
+
 
         <pre>
 terraform init
@@ -337,54 +678,421 @@ terraform validate
 terraform plan
       |
       v
-Review changes
+REVIEW
       |
       v
 terraform apply
       |
       v
-Verify Route 53
+terraform output
+      |
+      v
+terraform state list
       |
       v
 terraform destroy
         </pre>
 
+
+        <p>
+            In this portal we teach the workflow,
+            but the Flask application does not execute these commands.
+        </p>
+
     </div>
 
+
+
+    <!-- =====================================================
+         COMMANDS
+    ====================================================== -->
 
     <div class="card">
 
         <h2>
-            Learning Safety
+            Command Reference
         </h2>
 
-        <div class="warn">
 
-            <strong>
-                Important
-            </strong>
-
-            <p>
-                Do not store AWS credentials in Terraform source files.
-                Do not commit Terraform state or secret variable files.
-            </p>
-
+        <div class="terminal-title">
+            TERRAFORM CLI
         </div>
 
+
+        <pre>terraform init</pre>
+
+        <pre>terraform fmt -recursive</pre>
+
+        <pre>terraform validate</pre>
+
+        <pre>terraform plan</pre>
+
+        <pre>terraform apply</pre>
+
+        <pre>terraform output</pre>
+
+        <pre>terraform state list</pre>
+
+        <pre>terraform destroy</pre>
+
     </div>
 
+
+
+    <!-- =====================================================
+         EXPECTED OUTPUT
+    ====================================================== -->
 
     <div class="card">
 
         <h2>
-            Next Step
+            Expected Learning Result
         </h2>
 
-        <a href="/automation/terraform/lifecycle">
-            Continue to Terraform Lifecycle →
+
+        <pre>
+Hosted Zone
+-----------
+ajaynetwork.com
+
+
+Name Servers
+------------
+Route 53 returns authoritative NS records
+
+
+DNS Record
+----------
+resume.ajaynetwork.com
+
+
+Record Type
+-----------
+CNAME
+
+
+Target
+------
+network-app.ajaynetwork.com
+        </pre>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         IF TARGET IS AN IP
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            What If the Resume Site Uses an IP Address?
+        </h2>
+
+        <p>
+            A CNAME points to another hostname.
+            If your target is an IPv4 address instead,
+            use an A record.
+        </p>
+
+
+        <div class="terminal-title">
+            A RECORD EXAMPLE
+        </div>
+
+
+        <pre><code>resource "aws_route53_record" "resume" {
+  zone_id = aws_route53_zone.ajaynetwork.zone_id
+
+  name = "resume.${var.domain_name}"
+
+  type = "A"
+
+  ttl = 300
+
+  records = [
+    "192.0.2.10"
+  ]
+}</code></pre>
+
+
+        <p>
+            The address above is documentation-only.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CNAME VS A
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            A Record vs CNAME
+        </h2>
+
+
+        <pre>
+A RECORD
+
+resume.ajaynetwork.com
+        |
+        v
+IPv4 address
+
+
+CNAME
+
+resume.ajaynetwork.com
+        |
+        v
+another hostname
+        </pre>
+
+
+        <p>
+            Choose the DNS record type based on what the
+            application endpoint actually provides.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         EXISTING CLOUDFLARE
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            If ajaynetwork.com Already Uses Cloudflare
+        </h2>
+
+        <p>
+            Do not automatically move the root domain away from
+            Cloudflare just to test Terraform.
+        </p>
+
+
+        <pre>
+Current possible design
+
+ajaynetwork.com
+      |
+      v
+Cloudflare DNS
+      |
+      v
+Existing applications
+        </pre>
+
+
+        <p>
+            A future advanced lab could demonstrate subdomain
+            delegation from Cloudflare to a separate Route 53
+            hosted zone.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ADVANCED DELEGATION PREVIEW
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Future Advanced Design: Subdomain Delegation
+        </h2>
+
+
+        <pre>
+Cloudflare
+ajaynetwork.com
+      |
+      | NS delegation
+      v
+Route 53 Hosted Zone
+resume.ajaynetwork.com
+      |
+      v
+Records managed by Route 53
+        </pre>
+
+
+        <p>
+            This is a different design from creating
+            <code>resume.ajaynetwork.com</code> as a normal record
+            inside the <code>ajaynetwork.com</code> hosted zone.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SECURITY
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Security Rules
+        </h2>
+
+
+        <ul>
+
+            <li>
+                Never hard-code AWS access keys in Terraform files.
+            </li>
+
+            <li>
+                Do not commit Terraform state files.
+            </li>
+
+            <li>
+                Do not commit sensitive
+                <code>terraform.tfvars</code> files.
+            </li>
+
+            <li>
+                Review <code>terraform plan</code>
+                before a real apply.
+            </li>
+
+            <li>
+                Understand the DNS authority model before
+                changing production name servers.
+            </li>
+
+        </ul>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         GITIGNORE
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Recommended Terraform .gitignore
+        </h2>
+
+
+        <pre><code># Terraform local working directory
+**/.terraform/*
+
+# Terraform state
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Environment-specific variable files
+*.tfvars
+*.tfvars.json
+
+# Keep example templates
+!*.tfvars.example
+
+# Local CLI configuration
+.terraformrc
+terraform.rc</code></pre>
+
+
+        <p>
+            Keep <code>.terraform.lock.hcl</code>
+            under version control for a real root Terraform project.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         COMPLETE MENTAL MODEL
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Complete Mental Model
+        </h2>
+
+
+        <pre>
+Engineer writes .tf files
+        |
+        v
+Terraform Core
+        |
+        v
+AWS Provider
+        |
+        v
+Route 53 API
+        |
+        v
+Hosted Zone
+ajaynetwork.com
+        |
+        v
+DNS Record
+resume.ajaynetwork.com
+        |
+        v
+Application Target
+        </pre>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         NEXT / BACK
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Continue Learning
+        </h2>
+
+
+        <p>
+            Review the AWS Provider lesson if the relationship
+            between Terraform and AWS is not yet clear.
+        </p>
+
+
+        <a href="/automation/terraform/aws-provider">
+            ← AWS Provider Lesson
         </a>
 
+
         <br><br>
+
+
+        <a href="/automation/terraform/lifecycle">
+            Terraform Lifecycle →
+        </a>
+
+
+        <br><br>
+
 
         <a href="/automation/terraform">
             ← Back to Terraform Portal
@@ -397,6 +1105,7 @@ terraform destroy
 
 
 <script src="/static/app.js"></script>
+
 
 </body>
 
